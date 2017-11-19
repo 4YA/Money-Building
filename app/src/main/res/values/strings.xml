@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Money-Building</string>
+    <string name="sign_in_page_title">Sign In</string>
+    <string name="title">Money Building</string>
+    <string name="Account_Number">Account Number</string>
+    <string name="Password">Password</string>
+    <string name="Forget_Password">Forget Password</string>
+    <string name="Image">Image</string>
+
+
+</resources>
