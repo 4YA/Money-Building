@@ -31,6 +31,8 @@
         <activity
             android:name=".ForgotPassword"
             android:label="取回密碼" />
+        <activity android:name=".Character"
+            android:label="選擇角色"></activity>
     </application>
 
 </manifest>

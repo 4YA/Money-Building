@@ -46,6 +46,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(Login.this, Register.class);
+                intent.putExtra("newSelect", 0);
                 startActivity(intent);
             }
         });
@@ -97,7 +98,7 @@ public class Login extends AppCompatActivity {
                         String password = String.format(passwordText.getText().toString());
                         Map<String, String> map = new HashMap<String, String>();
                         map.put("state", "loginVerification");
-                        map.put("account", account);
+                        map.put("email", account);
                         map.put("password", password);
                         return map;
                     }

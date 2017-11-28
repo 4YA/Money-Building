@@ -14,7 +14,7 @@
         android:layout_height="93dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="203dp"
+        android:layout_marginBottom="204dp"
         android:src="@drawable/title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
