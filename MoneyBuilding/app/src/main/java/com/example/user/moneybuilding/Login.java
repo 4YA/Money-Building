@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -59,51 +60,65 @@ public class Login extends AppCompatActivity {
         });
         loginButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/LoginServlet",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.v("狀態",response);
-                                if(response.equals("")) {
-                                    new AlertDialog.Builder(Login.this)
-                                            .setTitle("提示")//設定視窗標題
-                                            .setIcon(R.mipmap.ic_launcher)//設定對話視窗圖示
-                                            .setMessage("帳號或密碼輸入錯誤")//設定顯示的文字
-                                            .setPositiveButton("關閉", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
+                if(Linkify.addLinks(accountText.getText(), Linkify.EMAIL_ADDRESSES)) {
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/LoginServlet",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.v("狀態", response);
+                                    if (response.equals("")) {
+                                        new AlertDialog.Builder(Login.this)
+                                                .setTitle("提示")//設定視窗標題
+                                                .setIcon(R.mipmap.ic_launcher)//設定對話視窗圖示
+                                                .setMessage("帳號或密碼輸入錯誤")//設定顯示的文字
+                                                .setPositiveButton("關閉", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
 
-                                                }
-                                            })//設定結束的子視窗
-                                            .show();//呈現對話視窗
-                                }else {
-                                    SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
-                                    pref.edit()
-                                            .putString("userID", response)
-                                            .commit();
-                                    Intent intent = new Intent();
-                                    intent.setClass(Login.this, HomePage.class);
-                                    startActivity(intent);
-                                    finish();
+                                                    }
+                                                })//設定結束的子視窗
+                                                .show();//呈現對話視窗
+                                    } else {
+                                        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
+                                        pref.edit()
+                                                .putString("userID", response)
+                                                .commit();
+                                        Intent intent = new Intent();
+                                        intent.setClass(Login.this, HomePage.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                 }
-                            }
-                        }, new Response.ErrorListener() {
-                    // @Override
-                    public void onErrorResponse(VolleyError error) {    //錯誤訊息
-                    }
-                }) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        String account = String.format(accountText.getText().toString());
-                        String password = String.format(passwordText.getText().toString());
-                        Map<String, String> map = new HashMap<String, String>();
-                        map.put("state", "loginVerification");
-                        map.put("email", account);
-                        map.put("password", password);
-                        return map;
-                    }
-                };
-                queue.add(stringRequest);   //把request丟進queue(佇列)
+                            }, new Response.ErrorListener() {
+                        // @Override
+                        public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                        }
+                    }) {
+                        @Override
+                        protected Map<String, String> getParams() {
+                            String account = String.format(accountText.getText().toString());
+                            String password = String.format(passwordText.getText().toString());
+                            Map<String, String> map = new HashMap<String, String>();
+                            map.put("state", "loginVerification");
+                            map.put("email", account);
+                            map.put("password", password);
+                            return map;
+                        }
+                    };
+                    queue.add(stringRequest);   //把request丟進queue(佇列)
+                }else{
+                    new AlertDialog.Builder(Login.this)
+                            .setTitle("提示")//設定視窗標題
+                            .setIcon(R.mipmap.ic_launcher)//設定對話視窗圖示
+                            .setMessage("帳號或密碼輸入錯誤")//設定顯示的文字
+                            .setPositiveButton("關閉", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            })//設定結束的子視窗
+                            .show();//呈現對話視窗
+                }
             }
         });
     }

@@ -48,8 +48,8 @@
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
             android:layout_weight="1"
-            android:ems="10"
-            android:hint="請填寫電子信箱"
+            android:maxLength="100"
+            android:hint="請輸入電子信箱"
             android:inputType="textEmailAddress"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
@@ -78,8 +78,8 @@
             android:layout_marginRight="15dp"
             android:layout_marginTop="15dp"
             android:layout_weight="1"
-            android:ems="10"
-            android:hint="請填寫密碼"
+            android:maxLength="12"
+            android:hint="請輸入密碼"
             android:inputType="textPassword"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
