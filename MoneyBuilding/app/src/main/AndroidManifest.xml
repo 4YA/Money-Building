@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Welcome">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,6 +24,12 @@
             android:label="登入" />
         <activity
             android:name=".HomePage"
+            android:label="Money Building"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".ListViewActivity"
             android:label="Money Building"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
