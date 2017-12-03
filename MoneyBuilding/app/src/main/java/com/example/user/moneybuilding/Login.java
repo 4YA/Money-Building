@@ -61,7 +61,7 @@ public class Login extends AppCompatActivity {
         loginButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 if(Linkify.addLinks(accountText.getText(), Linkify.EMAIL_ADDRESSES)) {
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/LoginServlet",
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"LoginServlet",
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {

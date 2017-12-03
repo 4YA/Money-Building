@@ -28,6 +28,7 @@ public class Character extends AppCompatActivity implements View.OnClickListener
     private int total;
     private int count = 0;
     private int nowSelect;
+    private String page;
     String tempEmail, tempPassword, tempCheckPassword, tempName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +38,12 @@ public class Character extends AppCompatActivity implements View.OnClickListener
         Bundle bundle = this.getIntent().getExtras();
         total = bundle.getInt("count");
         nowSelect = bundle.getInt("nowSelect");
+        page = bundle.getString("page");
 
         for (int i = 1; i <= total; i++) {
             GetXMLTask task = new GetXMLTask();
             // Execute the task
-            task.execute(new String[]{"http://140.121.197.130:8004/Money-Building/CharacterServlet?state=getCharacter&characterID=" + i});
+            task.execute(new String[]{getString(R.string.servletURL)+"CharacterServlet?state=getCharacter&characterID=" + i});
         }
     }
     private class GetXMLTask extends AsyncTask<String, Void, Bitmap> {
@@ -116,7 +118,10 @@ public class Character extends AppCompatActivity implements View.OnClickListener
     public void onClick(View v) {
         nowSelect = v.getId();
         Intent intent = new Intent();
-        intent.setClass(Character.this, Register.class);
+        if(page.equals("Register"))
+            intent.setClass(Character.this, Register.class);
+        else
+            intent.setClass(Character.this, PersonalInformation.class);
         intent.putExtra("nowSelect", Integer.valueOf(nowSelect));
         startActivity(intent);
         finish();
@@ -127,7 +132,10 @@ public class Character extends AppCompatActivity implements View.OnClickListener
 
         if (keyCode == KeyEvent.KEYCODE_BACK) { // 攔截返回鍵
             Intent intent = new Intent();
-            intent.setClass(Character.this, Register.class);
+            if(page.equals("Register"))
+                intent.setClass(Character.this, Register.class);
+            else
+                intent.setClass(Character.this, PersonalInformation.class);
             intent.putExtra("nowSelect", nowSelect);
             startActivity(intent);
             finish();

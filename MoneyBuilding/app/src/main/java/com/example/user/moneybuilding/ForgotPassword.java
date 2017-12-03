@@ -50,7 +50,7 @@ public class ForgotPassword extends AppCompatActivity {
             public void onClick(View v) {
                 if(textState == 0) {
                     if(Linkify.addLinks(emailText.getText(), Linkify.EMAIL_ADDRESSES)) {
-                        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/ForgotPasswordServlet",
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"ForgotPasswordServlet",
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
@@ -132,7 +132,7 @@ public class ForgotPassword extends AppCompatActivity {
                                 .show();//呈現對話視窗
                     }
                 }else{
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/ForgotPasswordServlet",
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"ForgotPasswordServlet",
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {

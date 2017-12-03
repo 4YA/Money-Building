@@ -23,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,16 +65,16 @@ public class Register extends AppCompatActivity {
         Bundle bundle = this.getIntent().getExtras();
         nowSelect = bundle.getInt("nowSelect");
         if(nowSelect != 0) {
-            GetXMLTask task = new GetXMLTask();
-            // Execute the task
-            task.execute(new String[]{"http://140.121.197.130:8004/Money-Building/CharacterServlet?state=getCharacter&characterID=" + nowSelect});
+            Picasso.with(Register.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + nowSelect).transform(new CircleTransform())
+                    .into(selectCharacter);
+            backImageView.setVisibility(View.VISIBLE);
         }
 
         queue1 = Volley.newRequestQueue(this);
         queue2 = Volley.newRequestQueue(this);
         selectCharacter.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, "http://140.121.197.130:8004/Money-Building/CharacterServlet?state=getImageCount",
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getString(R.string.servletURL)+"CharacterServlet?state=getImageCount",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -88,6 +89,7 @@ public class Register extends AppCompatActivity {
                         intent.setClass(Register.this, Character.class);
                         intent.putExtra("count", Integer.valueOf(response));
                         intent.putExtra("nowSelect", nowSelect);
+                        intent.putExtra("page", "Register");
                         startActivity(intent);
                         finish();
                     }
@@ -109,7 +111,7 @@ public class Register extends AppCompatActivity {
                     if(passwordNum > 5){
                         if(passwordString.equals(checkPasswordString)) {
                             if (nameString.length() != 0) {
-                                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8004/Money-Building/RegisterServlet",
+                                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"RegisterServlet",
                                         new Response.Listener<String>() {
                                             @Override
                                             public void onResponse(String response) {
@@ -214,61 +216,5 @@ public class Register extends AppCompatActivity {
                 }
             }
         });
-    }
-    private class GetXMLTask extends AsyncTask<String, Void, Bitmap> {
-        @Override
-        protected Bitmap doInBackground(String... urls) {
-            Bitmap map = null;
-            for (String url : urls) {
-                map = downloadImage(url);
-            }
-            return map;
-        }
-
-        // Sets the Bitmap returned by doInBackground
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            selectCharacter.setImageBitmap(result);
-            backImageView.setVisibility(View.VISIBLE);
-        }
-
-        // Creates Bitmap from InputStream and returns it
-        private Bitmap downloadImage(String url) {
-            Bitmap bitmap = null;
-            InputStream stream = null;
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inSampleSize = 1;
-
-            try {
-                stream = getHttpConnection(url);
-                bitmap = BitmapFactory.
-                        decodeStream(stream, null, bmOptions);
-                stream.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            return bitmap;
-        }
-
-        // Makes HttpURLConnection and returns InputStream
-        private InputStream getHttpConnection(String urlString)
-                throws IOException {
-            InputStream stream = null;
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-
-            try {
-                HttpURLConnection httpConnection = (HttpURLConnection) connection;
-                httpConnection.setRequestMethod("GET");
-                httpConnection.connect();
-
-                if (httpConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    stream = httpConnection.getInputStream();
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return stream;
-        }
     }
 }
