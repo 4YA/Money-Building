@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -104,7 +106,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        addTallybook();
+        addTallybook(false);
         deleteTallybook();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -148,10 +150,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             public void onClick(View v) {
                 deleteButton=!deleteButton;
                 if(deleteButton){
-                    changePicture(R.drawable.plus_del);
+
+                    changePicture(R.drawable.plus_del,"gray");
 
                 }else{
-                    changePicture(R.drawable.plus);
+                    changePicture(R.drawable.plus,"#FF4081");
 
                 }
 
@@ -159,7 +162,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         });
     }
 
-    public void addTallybook(){
+    public void addTallybook(boolean checkIfCreate){
         FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
         myFab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -209,7 +212,10 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         });
     }
 
-    public void changePicture(int url){
+    public void changePicture(int url,String backgroundColor){
+        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fabDel);
+        int tint = Color.parseColor(backgroundColor);
+        myFab.getBackground().setColorFilter(tint, PorterDuff.Mode.DARKEN);
         for(int i=0;i<mDatas.size();i++){
             View imView= mRecyclerView.getLayoutManager().findViewByPosition(i);
             ImageButton changePic = (ImageButton) imView.findViewById(R.id.adapter_linear_text);
@@ -416,6 +422,12 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 }
                             });
                             dialog.show();
+                        }else{
+                            Intent intent = new Intent();
+                            intent.setClass(HomePage.this, MainTallyBook.class);
+                            startActivity(intent);
+                            finish();
+
                         }
                     }
                 });
