@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.github.yavski.fabspeeddial.samples.PositionSampleActivity">
+    <item
+        android:id="@+id/edit_talltbook"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:orderInCategory="100"
+        android:title="編輯帳本"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/edit_item"
+        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:orderInCategory="100"
+        android:title="編輯帳目"
+        app:showAsAction="never" />
+
+
+</menu>
