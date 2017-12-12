@@ -105,11 +105,14 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                                 .show();
                         return true;
                     case R.id.edit_item:
-                        Log.e("Bottom Sheet Behaviour", "帳目");
+                        Intent intent = new Intent();
+                        intent.setClass(MainTallyBook.this, EditBookList.class);
+                        startActivity(intent);
+                        finish();
                         return true;
                 }
 
-                //TODO: Start some activity
+
                 return false;
             }
         });
@@ -286,7 +289,6 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // TODO Auto-generated method stub
 
         if (keyCode == KeyEvent.KEYCODE_BACK) { // 攔截返回鍵
             Intent intent = new Intent();

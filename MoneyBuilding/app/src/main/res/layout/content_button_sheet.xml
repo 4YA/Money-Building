@@ -78,6 +78,7 @@
     </RadioGroup>
     <EditText
         android:id="@+id/moneyText"
+        android:inputType="number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/moneyView"
@@ -187,6 +188,7 @@
         android:textAppearance="@android:style/TextAppearance.Large" />
     <EditText
         android:id="@+id/editMoneyItem"
+        android:inputType="text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/imageButton5"

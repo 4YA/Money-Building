@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <EditText
-        android:id="@+id/moneyInput"
-        android:inputType="number"
+        android:id="@+id/id_Input"
+        android:inputType="text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
