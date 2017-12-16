@@ -8,4 +8,13 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_xxx">XXXActivity</string>
     <string name="servletURL">http://140.121.197.130:8901/Money-Building/</string>
+
+    <string name="buttom_1_name">交通</string>
+    <string name="buttom_2_name">購物</string>
+    <string name="buttom_3_name">收入</string>
+    <string name="buttom_4_name">娛樂</string>
+    <string name="buttom_5_name">飲食</string>
+    <string name="buttom_6_name">電信</string>
+    <string name="buttom_7_name">醫療</string>
+    <string name="buttom_8_name">其他</string>
 </resources>

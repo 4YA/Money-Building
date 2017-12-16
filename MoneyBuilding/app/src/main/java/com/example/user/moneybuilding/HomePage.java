@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +14,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,9 +32,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -46,6 +53,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.yavski.fabspeeddial.FabSpeedDial;
+import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import static android.util.Log.v;
 
 public class HomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -60,6 +71,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private String userID;
     private List<String> mDatas = new ArrayList<String>();
     private int mYear, mMonth, mDay;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +117,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        addTallybook();
-        deleteTallybook();
+        changeTallybook();
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -142,79 +155,175 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
-    public void deleteTallybook(){
-        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fabDel);
-        myFab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                deleteButton=!deleteButton;
-                if(deleteButton){
-                    changePicture(R.drawable.plus_del);
 
-                }else{
-                    changePicture(R.drawable.plus);
+    public void changeTallybook(){
+       final FabSpeedDial fabSpeedDialMain = (FabSpeedDial) findViewById(R.id.fab_speed_dial_in_main);
 
-                }
+        fabSpeedDialMain.setMenuListener(new SimpleMenuListenerAdapter() {
+            @Override
+            public boolean onMenuItemSelected(MenuItem menuItem) {
+               // if(!deleteButton) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.add_tallybook_by_click:
+                            changeBack();
+                            //if(!deleteButton) {
+                            LayoutInflater inflater = LayoutInflater.from(HomePage.this);
+                            final View dialogName = inflater.inflate(R.layout.new_tallybook, null);
 
-            }
-        });
-    }
+                            endDate = (RadioGroup) dialogName.findViewById(R.id.endDate);
+                            endDateYes = (RadioButton) dialogName.findViewById(R.id.endDateYes);
+                            target = (RadioGroup) dialogName.findViewById(R.id.target);
+                            targetYes = (RadioButton) dialogName.findViewById(R.id.targetYes);
+                            endDate.setOnCheckedChangeListener(listenerEndDate);
+                            target.setOnCheckedChangeListener(listenerTarget);
 
-    public void addTallybook(){
-        FloatingActionButton myFab = (FloatingActionButton) findViewById(R.id.fab);
-        myFab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(!deleteButton) {
-                    LayoutInflater inflater = LayoutInflater.from(HomePage.this);
-                    final View dialogName = inflater.inflate(R.layout.new_tallybook, null);
+                            new AlertDialog.Builder(HomePage.this)
+                                    .setTitle("新增帳本")
+                                    .setView(dialogName)
+                                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            EditText nameText = (EditText) dialogName.findViewById(R.id.editTallybookName);
+                                            if (nameText.getText().toString().equals("")) {
+                                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                alertDialog.setTitle("提醒");
+                                                alertDialog.setMessage("需填入帳本名稱!");
+                                                alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                    }
+                                                });
+                                                alertDialog.show();
 
-                    endDate = (RadioGroup) dialogName.findViewById(R.id.endDate);
-                    endDateYes = (RadioButton) dialogName.findViewById(R.id.endDateYes);
-                    target = (RadioGroup) dialogName.findViewById(R.id.target);
-                    targetYes = (RadioButton) dialogName.findViewById(R.id.targetYes);
-                    endDate.setOnCheckedChangeListener(listenerEndDate);
-                    target.setOnCheckedChangeListener(listenerTarget);
-
-                    new AlertDialog.Builder(HomePage.this)
-                            .setTitle("新增帳本")
-                            .setView(dialogName)
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setPositiveButton("確定", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    EditText nameText = (EditText) dialogName.findViewById(R.id.editTallybookName);
-                                    if (nameText.getText().toString().equals("")) {
-                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
-                                        alertDialog.setTitle("提醒");
-                                        alertDialog.setMessage("需填入帳本名稱!");
-                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface arg0, int arg1) {
+                                            } else {
+                                                addData(1);
                                             }
-                                        });
-                                        alertDialog.show();
+                                        }
+                                    })
+                                    .show();
+                            //}//
+                            return true;
+                        case R.id.add_tallybook_by_other:
+                            changeBack();
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                            alertDialog.setTitle("選擇加入現有帳本方式");
+                            alertDialog.setPositiveButton("輸入ID加入帳本", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    LayoutInflater inflater = LayoutInflater.from(HomePage.this);
+                                    final View dialogID = inflater.inflate(R.layout.input_id, null);
 
-                                    } else {
-                                        addData(1);
-                                    }
+                                    new AlertDialog.Builder(HomePage.this)
+                                            .setTitle("新增帳本")
+                                            .setView(dialogID)
+                                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                }
+                                            })
+                                            .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    EditText nameText = (EditText) dialogID.findViewById(R.id.id_Input);
+                                                    if (nameText.getText().toString().equals("")) {
+                                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                        alertDialog.setTitle("提醒");
+                                                        alertDialog.setMessage("需填入帳本ID!");
+                                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface arg0, int arg1) {
+                                                            }
+                                                        });
+                                                        alertDialog.show();
+
+                                                    } else {
+                                                        addData(1);
+                                                    }
+                                                }
+                                            })
+                                            .show();
                                 }
-                            })
-                            .show();
-
-                }
+                            });
+                            alertDialog.setNeutralButton("以QR Code加入帳本", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1) {
+                                    IntentIntegrator integrator = new IntentIntegrator(HomePage.this);
+                                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                                    integrator.setCameraId(0);
+                                    integrator.setBeepEnabled(false);
+                                    integrator.setBarcodeImageEnabled(false);
+                                    integrator.initiateScan();
+                                }
+                            });
+                            alertDialog.show();
+                            return true;
+                        case R.id.delete_tallybook:
+                            if(mDatas.size()!=0){
+                                deleteButton=true;
+                                changePicture(R.drawable.plus_del,"gray");
+                            }
+                            return true;
+                    }
+               // }
+                return false;
             }
         });
     }
+    //掃描QRCode
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        if(result !=null){
+            if(result.getContents() == null){
+                Toast.makeText(this,"You can't celled the scanning",Toast.LENGTH_SHORT).show();;
+            }else {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"AddTallyBookServlet",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
 
-    public void changePicture(int url){
+
+
+                            }
+                        }, new Response.ErrorListener() {
+                    // @Override
+                    public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> map = new HashMap<String, String>();
+                        String QRCode = result.getContents();
+                        map.put("state", "addTallyBookFromQRCode");
+                        map.put("QRCode", QRCode);
+                        return map;
+                    }
+                };
+                queue.add(stringRequest);   //把request丟進queue(佇列)
+            }
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public void changePicture(int url,String backgroundColor){
+        int tint = Color.parseColor(backgroundColor);
         for(int i=0;i<mDatas.size();i++){
             View imView= mRecyclerView.getLayoutManager().findViewByPosition(i);
             ImageButton changePic = (ImageButton) imView.findViewById(R.id.adapter_linear_text);
             changePic.setImageResource(url);
         }
+    }
+
+    public void changeBack(){
+            deleteButton=false;
+            changePicture(R.drawable.plus,"#FF4081");
     }
 
     private RadioGroup.OnCheckedChangeListener listenerEndDate = new RadioGroup.OnCheckedChangeListener() {
@@ -413,9 +522,17 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 public void onClick(DialogInterface arg0, int arg1) {
                                     int index = getLayoutPosition();
                                     removeData(index);
+
                                 }
                             });
                             dialog.show();
+                            changeBack();
+                        }else{
+                            Intent intent = new Intent();
+                            intent.setClass(HomePage.this, MainTallyBook.class);
+                            startActivity(intent);
+                            finish();
+
                         }
                     }
                 });

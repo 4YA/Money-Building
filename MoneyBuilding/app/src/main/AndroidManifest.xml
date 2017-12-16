@@ -36,7 +36,9 @@
             android:label="選擇角色" />
         <activity
             android:name=".PersonalInformation"
-            android:label="基本資料"/>
+            android:label="基本資料" />
+        <activity android:name=".MainTallyBook" />
+        <activity android:name=".EditBookList"></activity>
     </application>
 
 </manifest>
