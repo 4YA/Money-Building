@@ -69,6 +69,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private boolean deleteButton=false;
     private RequestQueue queue;
     private String userID;
+	private int targetMoney;
     private List<String> mDatas = new ArrayList<String>();
     private int mYear, mMonth, mDay;
 
@@ -77,6 +78,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		 mYear =  mMonth = mDay = 0;
+        targetMoney = 0;
         //startActivity(new Intent(HomePage.this,ListViewActivity.class));
         setContentView(R.layout.activity_home_page);
         queue = Volley.newRequestQueue(this);
@@ -242,7 +245,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                         alertDialog.show();
 
                                                     } else {
-                                                        addData(1);
+                                                        addData(1,nameText.getText().toString());
                                                     }
                                                 }
                                             })
@@ -337,7 +340,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 new DatePickerDialog(HomePage.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
-
+							mYear = year;
+                            mMonth = month+1;
+                            mDay = day+1;
                     }
 
                 }, mYear,mMonth, mDay)
@@ -354,11 +359,15 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 LayoutInflater inflater = LayoutInflater.from(HomePage.this);
                 final View dialogName = inflater.inflate(R.layout.target_money, null);
                 new AlertDialog.Builder(HomePage.this)
-                        .setTitle("輸入目標金額")
+                        .setTitle("輸入目標金額(0代表不設定)")
                         .setView(dialogName)
                         .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+ 
+                                EditText editTargetMoney =   (EditText) dialogName.findViewById(R.id.moneyInput);
+ 
+                                targetMoney =  Integer.parseInt(editTargetMoney.getText().toString());
 
                             }
                         })
@@ -370,7 +379,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
 
 
-    public void addData(int position) {
+    public void addData(int position,final String nameText) {
         if(mDatas.size()==0){
             //initData();
             mDatas.add("Insert" + 0);
@@ -390,6 +399,38 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             mAdapter.notifyItemInserted(position);
 
         }
+		RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/AddTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //收到的資料
+                    }
+ 
+                }, new Response.ErrorListener() {
+                     @Override
+                     public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                    //如果沒連成功錯誤會到這裡
+                         Log.d("connection error",error.toString());
+                    }
+     }) {
+        @Override
+        protected Map<String, String> getParams() {
+            Map<String,String> map = new HashMap<String, String>();
+ 
+            map.put("state", "newTallyBook");
+            map.put("name",nameText);
+            map.put("year",Integer.toString(mYear));
+            map.put("month",Integer.toString(mMonth));
+            map.put("day",Integer.toString(mDay));
+            map.put("targetMoney",Integer.toString(targetMoney));
+            Log.d("test",nameText);
+            //放要傳到servlet的資料
+            return map;
+        }
+    };
+                  queue.toString();
+                queue.add(stringRequest);   //把request丟進queue(佇列)
 
     }
 
