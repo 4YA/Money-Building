@@ -114,8 +114,36 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 return map;
             }
         };
-        queue.add(stringRequest);   //把request丟進queue(佇列)
 
+        StringRequest stringRequest2  = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"GetTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+                            for(int s=0;s<arr.length();s++){
+                                addData(1);
+                            }
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "getTallyBook");
+                map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+
+                return map;
+            }
+        };
+
+        queue.add(stringRequest);   //把request丟進queue(佇列)
+        queue.add(stringRequest2);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -205,6 +233,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
                                             } else {
                                                 addData(1);
+                                                addToServer(nameText.getText().toString());
                                             }
                                         }
                                     })
@@ -245,7 +274,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                         alertDialog.show();
 
                                                     } else {
-                                                        addData(1,nameText.getText().toString());
+                                                        addData(1);
                                                     }
                                                 }
                                             })
@@ -379,7 +408,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
 
 
-    public void addData(int position,final String nameText) {
+    public void addData(int position) {
         if(mDatas.size()==0){
             //initData();
             mDatas.add("Insert" + 0);
@@ -399,39 +428,45 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             mAdapter.notifyItemInserted(position);
 
         }
-		RequestQueue queue = Volley.newRequestQueue(this);
+
+
+
+    }
+
+    public void addToServer(final String nameText){
+        RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/AddTallyBookServlet",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         //收到的資料
                     }
- 
-                }, new Response.ErrorListener() {
-                     @Override
-                     public void onErrorResponse(VolleyError error) {    //錯誤訊息
-                    //如果沒連成功錯誤會到這裡
-                         Log.d("connection error",error.toString());
-                    }
-     }) {
-        @Override
-        protected Map<String, String> getParams() {
-            Map<String,String> map = new HashMap<String, String>();
- 
-            map.put("state", "newTallyBook");
-            map.put("name",nameText);
-            map.put("year",Integer.toString(mYear));
-            map.put("month",Integer.toString(mMonth));
-            map.put("day",Integer.toString(mDay));
-            map.put("targetMoney",Integer.toString(targetMoney));
-            Log.d("test",nameText);
-            //放要傳到servlet的資料
-            return map;
-        }
-    };
-                  queue.toString();
-                queue.add(stringRequest);   //把request丟進queue(佇列)
 
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                //如果沒連成功錯誤會到這裡
+                Log.d("connection error",error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> map = new HashMap<String, String>();
+
+                map.put("state", "newTallyBook");
+                map.put("userID",  getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+                map.put("name",nameText);
+                map.put("year",Integer.toString(mYear));
+                map.put("month",Integer.toString(mMonth));
+                map.put("day",Integer.toString(mDay));
+                map.put("targetMoney",Integer.toString(targetMoney));
+                Log.d("test",nameText);
+                //放要傳到servlet的資料
+                return map;
+            }
+        };
+        queue.toString();
+        queue.add(stringRequest);   //把request丟進queue(佇列)
     }
 
     public void removeData(int position) {
