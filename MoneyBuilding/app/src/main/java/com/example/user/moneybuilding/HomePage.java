@@ -47,6 +47,8 @@ import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -251,7 +253,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                     final View dialogID = inflater.inflate(R.layout.input_id, null);
 
                                     new AlertDialog.Builder(HomePage.this)
-                                            .setTitle("新增帳本")
+                                            .setTitle("加入帳本")
                                             .setView(dialogID)
                                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                                 @Override
@@ -262,7 +264,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     EditText nameText = (EditText) dialogID.findViewById(R.id.id_Input);
-                                                    if (nameText.getText().toString().equals("")) {
+                                                    final String ID = nameText.getText().toString();
+                                                    if (ID.equals("")) {
                                                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
                                                         alertDialog.setTitle("提醒");
                                                         alertDialog.setMessage("需填入帳本ID!");
@@ -274,7 +277,48 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                         alertDialog.show();
 
                                                     } else {
-                                                        addData(1);
+                                                        StringRequest stringRequest  = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"JoinTallyBookServlet",
+                                                                new Response.Listener<String>() {
+                                                                    @Override
+                                                                    public void onResponse(String response) {
+                                                                        try {
+                                                                            JSONObject obj = new JSONObject(response);
+                                                                            Log.d("HAHAHA",obj.toString());
+                                                                            if(obj.isNull("tallyBookID")){
+                                                                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                                                alertDialog.setTitle("提醒");
+                                                                                alertDialog.setMessage("查無此ID!");
+                                                                                alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                    }
+                                                                                });
+                                                                                alertDialog.show();
+                                                                            }
+                                                                            else{
+                                                                                addData(1);
+                                                                            }
+
+                                                                        } catch (Throwable t) {
+                                                                        }
+                                                                    }
+                                                                }, new Response.ErrorListener() {
+                                                            // @Override
+                                                            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                                                                Log.d("error",error.toString());
+                                                            }
+                                                        }) {
+                                                            @Override
+                                                            protected Map<String, String> getParams() {
+                                                                Map<String, String> map = new HashMap<String, String>();
+                                                                map.put("state", "getTallyBookByID");
+                                                                map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+                                                                map.put("tallyBookID", ID);
+
+                                                                return map;
+                                                            }
+                                                        };
+                                                        queue.add(stringRequest);
                                                     }
                                                 }
                                             })
@@ -315,7 +359,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             if(result.getContents() == null){
                 Toast.makeText(this,"You can't celled the scanning",Toast.LENGTH_SHORT).show();;
             }else {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"AddTallyBookServlet",
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"JoinTallyBookServlet",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -332,7 +376,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                     protected Map<String, String> getParams() {
                         Map<String, String> map = new HashMap<String, String>();
                         String QRCode = result.getContents();
-                        map.put("state", "addTallyBookFromQRCode");
+                        map.put("state", "getTallyBookByQRCode");
+                        map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
                         map.put("QRCode", QRCode);
                         return map;
                     }
@@ -371,7 +416,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                     public void onDateSet(DatePicker view, int year, int month, int day) {
 							mYear = year;
                             mMonth = month+1;
-                            mDay = day+1;
+                            mDay = day;
                     }
 
                 }, mYear,mMonth, mDay)
