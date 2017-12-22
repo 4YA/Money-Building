@@ -88,7 +88,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         userID = getSharedPreferences("data", MODE_PRIVATE)
                 .getString("userID", "");
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"PersonalInformationServlet",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"PersonalInformationServlet",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -98,7 +98,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             headerName.setText(arr.get(1).toString());
                             //取得名字&角色圖片
                             ImageView headerImage = findViewById(R.id.headerImage);
-                            Picasso.with(HomePage.this).load( getString(R.string.servletURL)+"CharacterServlet?state=getCharacter&characterID="+arr.get(0).toString()).transform(new CircleTransform())
+                            Picasso.with(HomePage.this).load( "http://140.121.197.130:8901/Money-Building/"+"CharacterServlet?state=getCharacter&characterID="+arr.get(0).toString()).transform(new CircleTransform())
                                     .into(headerImage);
                         } catch (Throwable t) {
                         }
@@ -117,7 +117,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             }
         };
 
-        StringRequest stringRequest2  = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"GetTallyBookServlet",
+        StringRequest stringRequest2  = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -277,14 +277,17 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                         alertDialog.show();
 
                                                     } else {
-                                                        StringRequest stringRequest  = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"JoinTallyBookServlet",
+                                                        StringRequest stringRequest  = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"JoinTallyBookServlet",
                                                                 new Response.Listener<String>() {
                                                                     @Override
                                                                     public void onResponse(String response) {
-                                                                        try {
+                                                                         try{
                                                                             JSONObject obj = new JSONObject(response);
-                                                                            Log.d("HAHAHA",obj.toString());
-                                                                            if(obj.isNull("tallyBookID")){
+                                                                             Log.d("objTostring",obj.toString());
+
+
+                                                                            if(obj.has("isEmpty")){
+
                                                                                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
                                                                                 alertDialog.setTitle("提醒");
                                                                                 alertDialog.setMessage("查無此ID!");
@@ -295,8 +298,31 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                                                 });
                                                                                 alertDialog.show();
                                                                             }
+                                                                            else if(obj.has("isDuplicated")){
+
+                                                                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                                                alertDialog.setTitle("提醒");
+                                                                                alertDialog.setMessage("你已加入過此帳本!");
+                                                                                alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                    }
+                                                                                });
+                                                                                alertDialog.show();
+                                                                            }
                                                                             else{
-                                                                                addData(1);
+
+                                                                                AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
+                                                                                d1.setTitle("提醒");
+                                                                                d1.setMessage("加入成功!");
+                                                                                d1.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                        addData(1);
+                                                                                    }
+                                                                                });
+                                                                                d1.show();
+
                                                                             }
 
                                                                         } catch (Throwable t) {
@@ -359,13 +385,56 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             if(result.getContents() == null){
                 Toast.makeText(this,"You can't celled the scanning",Toast.LENGTH_SHORT).show();;
             }else {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"JoinTallyBookServlet",
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"JoinTallyBookServlet",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                try{
+                                    JSONObject obj = new JSONObject(response);
+                                    Log.d("objTostring",obj.toString());
 
 
+                                    if(obj.has("isEmpty")){
 
+                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                        alertDialog.setTitle("提醒");
+                                        alertDialog.setMessage("查無此ID!");
+                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    }
+                                    else if(obj.has("isDuplicated")){
+
+                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                        alertDialog.setTitle("提醒");
+                                        alertDialog.setMessage("你已加入過此帳本!");
+                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    }
+                                    else{
+
+                                        AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
+                                        d1.setTitle("提醒");
+                                        d1.setMessage("加入成功!");
+                                        d1.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                                addData(1);
+                                            }
+                                        });
+                                        d1.show();
+
+                                    }
+
+                                } catch (Throwable t) {
+                                }
                             }
                         }, new Response.ErrorListener() {
                     // @Override
