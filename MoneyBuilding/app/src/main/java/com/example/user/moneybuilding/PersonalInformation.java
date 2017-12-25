@@ -63,9 +63,11 @@ public class PersonalInformation extends AppCompatActivity {
             pref.edit().clear().commit();
             Bundle bundle = this.getIntent().getExtras();
             nowSelect = bundle.getInt("nowSelect");
-            Picasso.with(PersonalInformation.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + nowSelect).transform(new CircleTransform())
-                    .into(selectCharacter);
-            backImageView.setVisibility(View.VISIBLE);
+            if(nowSelect != 0) {
+                Picasso.with(PersonalInformation.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + nowSelect).transform(new CircleTransform())
+                        .into(selectCharacter);
+                backImageView.setVisibility(View.VISIBLE);
+            }
         }
         else {
             queue1 = Volley.newRequestQueue(this);
@@ -77,9 +79,11 @@ public class PersonalInformation extends AppCompatActivity {
                                 JSONArray arr = new JSONArray(response);
                                 name.setText(arr.get(1).toString());
                                 //取得名字&角色圖片
-                                Picasso.with(PersonalInformation.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + arr.get(0).toString()).transform(new CircleTransform())
-                                        .into(selectCharacter);
-                                backImageView.setVisibility(View.VISIBLE);
+                                if(!arr.get(0).toString().equals("0")) {
+                                    Picasso.with(PersonalInformation.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + arr.get(0).toString()).transform(new CircleTransform())
+                                            .into(selectCharacter);
+                                    backImageView.setVisibility(View.VISIBLE);
+                                }
                                 email.setText(arr.get(2).toString());
                                 password.setText(arr.get(3).toString());
                                 checkPassword.setText(arr.get(3).toString());

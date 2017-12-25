@@ -44,9 +44,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -69,6 +72,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private boolean deleteButton=false;
     private RequestQueue queue;
     private String userID;
+	private int targetMoney;
     private List<String> mDatas = new ArrayList<String>();
     private int mYear, mMonth, mDay;
 
@@ -77,13 +81,16 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mYear =  mMonth = mDay = 0;
+        targetMoney = 0;
         //startActivity(new Intent(HomePage.this,ListViewActivity.class));
         setContentView(R.layout.activity_home_page);
         queue = Volley.newRequestQueue(this);
         userID = getSharedPreferences("data", MODE_PRIVATE)
                 .getString("userID", "");
+        FirebaseMessaging.getInstance().subscribeToTopic("userID"+userID);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"PersonalInformationServlet",
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"PersonalInformationServlet",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -92,9 +99,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             TextView headerName = findViewById(R.id.headerName);
                             headerName.setText(arr.get(1).toString());
                             //取得名字&角色圖片
-                            ImageView headerImage = findViewById(R.id.headerImage);
-                            Picasso.with(HomePage.this).load( getString(R.string.servletURL)+"CharacterServlet?state=getCharacter&characterID="+arr.get(0).toString()).transform(new CircleTransform())
-                                    .into(headerImage);
+                            if(!arr.get(0).toString().equals("0")) {
+                                ImageView headerImage = findViewById(R.id.headerImage);
+                                Picasso.with(HomePage.this).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=" + arr.get(0).toString()).transform(new CircleTransform())
+                                        .into(headerImage);
+                            }
                         } catch (Throwable t) {
                         }
                     }
@@ -111,8 +120,36 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 return map;
             }
         };
-        queue.add(stringRequest);   //把request丟進queue(佇列)
 
+        StringRequest stringRequest2  = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+                            for(int s=0;s<arr.length();s++){
+                                addData(1);
+                            }
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "getTallyBook");
+                map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+
+                return map;
+            }
+        };
+
+        queue.add(stringRequest);   //把request丟進queue(佇列)
+        queue.add(stringRequest2);
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -202,6 +239,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
                                             } else {
                                                 addData(1);
+                                                addToServer(nameText.getText().toString());
                                             }
                                         }
                                     })
@@ -219,7 +257,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                     final View dialogID = inflater.inflate(R.layout.input_id, null);
 
                                     new AlertDialog.Builder(HomePage.this)
-                                            .setTitle("新增帳本")
+                                            .setTitle("加入帳本")
                                             .setView(dialogID)
                                             .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                                 @Override
@@ -230,7 +268,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     EditText nameText = (EditText) dialogID.findViewById(R.id.id_Input);
-                                                    if (nameText.getText().toString().equals("")) {
+                                                    final String ID = nameText.getText().toString();
+                                                    if (ID.equals("")) {
                                                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
                                                         alertDialog.setTitle("提醒");
                                                         alertDialog.setMessage("需填入帳本ID!");
@@ -242,7 +281,74 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                         alertDialog.show();
 
                                                     } else {
-                                                        addData(1);
+                                                        StringRequest stringRequest  = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"JoinTallyBookServlet",
+                                                                new Response.Listener<String>() {
+                                                                    @Override
+                                                                    public void onResponse(String response) {
+                                                                         try{
+                                                                            JSONObject obj = new JSONObject(response);
+                                                                             Log.d("objTostring",obj.toString());
+
+
+                                                                            if(obj.has("isEmpty")){
+
+                                                                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                                                alertDialog.setTitle("提醒");
+                                                                                alertDialog.setMessage("查無此ID!");
+                                                                                alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                    }
+                                                                                });
+                                                                                alertDialog.show();
+                                                                            }
+                                                                            else if(obj.has("isDuplicated")){
+
+                                                                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                                                                alertDialog.setTitle("提醒");
+                                                                                alertDialog.setMessage("你已加入過此帳本!");
+                                                                                alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                    }
+                                                                                });
+                                                                                alertDialog.show();
+                                                                            }
+                                                                            else{
+
+                                                                                AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
+                                                                                d1.setTitle("提醒");
+                                                                                d1.setMessage("加入成功!");
+                                                                                d1.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(DialogInterface arg0, int arg1) {
+                                                                                        addData(1);
+                                                                                    }
+                                                                                });
+                                                                                d1.show();
+
+                                                                            }
+
+                                                                        } catch (Throwable t) {
+                                                                        }
+                                                                    }
+                                                                }, new Response.ErrorListener() {
+                                                            // @Override
+                                                            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                                                                Log.d("error",error.toString());
+                                                            }
+                                                        }) {
+                                                            @Override
+                                                            protected Map<String, String> getParams() {
+                                                                Map<String, String> map = new HashMap<String, String>();
+                                                                map.put("state", "getTallyBookByID");
+                                                                map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+                                                                map.put("tallyBookID", ID);
+
+                                                                return map;
+                                                            }
+                                                        };
+                                                        queue.add(stringRequest);
                                                     }
                                                 }
                                             })
@@ -283,13 +389,56 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             if(result.getContents() == null){
                 Toast.makeText(this,"You can't celled the scanning",Toast.LENGTH_SHORT).show();;
             }else {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, getString(R.string.servletURL)+"AddTallyBookServlet",
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"JoinTallyBookServlet",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+                                try{
+                                    JSONObject obj = new JSONObject(response);
+                                    Log.d("objTostring",obj.toString());
 
 
+                                    if(obj.has("isEmpty")){
 
+                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                        alertDialog.setTitle("提醒");
+                                        alertDialog.setMessage("查無此ID!");
+                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    }
+                                    else if(obj.has("isDuplicated")){
+
+                                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomePage.this);
+                                        alertDialog.setTitle("提醒");
+                                        alertDialog.setMessage("你已加入過此帳本!");
+                                        alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                            }
+                                        });
+                                        alertDialog.show();
+                                    }
+                                    else{
+
+                                        AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
+                                        d1.setTitle("提醒");
+                                        d1.setMessage("加入成功!");
+                                        d1.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface arg0, int arg1) {
+                                                addData(1);
+                                            }
+                                        });
+                                        d1.show();
+
+                                    }
+
+                                } catch (Throwable t) {
+                                }
                             }
                         }, new Response.ErrorListener() {
                     // @Override
@@ -300,7 +449,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                     protected Map<String, String> getParams() {
                         Map<String, String> map = new HashMap<String, String>();
                         String QRCode = result.getContents();
-                        map.put("state", "addTallyBookFromQRCode");
+                        map.put("state", "getTallyBookByQRCode");
+                        map.put("userID", getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
                         map.put("QRCode", QRCode);
                         return map;
                     }
@@ -337,7 +487,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 new DatePickerDialog(HomePage.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
-
+							mYear = year;
+                            mMonth = month+1;
+                            mDay = day;
                     }
 
                 }, mYear,mMonth, mDay)
@@ -354,11 +506,15 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 LayoutInflater inflater = LayoutInflater.from(HomePage.this);
                 final View dialogName = inflater.inflate(R.layout.target_money, null);
                 new AlertDialog.Builder(HomePage.this)
-                        .setTitle("輸入目標金額")
+                        .setTitle("輸入目標金額(0代表不設定)")
                         .setView(dialogName)
                         .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+ 
+                                EditText editTargetMoney =   (EditText) dialogName.findViewById(R.id.moneyInput);
+ 
+                                targetMoney =  Integer.parseInt(editTargetMoney.getText().toString());
 
                             }
                         })
@@ -391,6 +547,44 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         }
 
+
+
+    }
+
+    public void addToServer(final String nameText){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/AddTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //收到的資料
+                    }
+
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                //如果沒連成功錯誤會到這裡
+                Log.d("connection error",error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> map = new HashMap<String, String>();
+
+                map.put("state", "newTallyBook");
+                map.put("userID",  getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+                map.put("name",nameText);
+                map.put("year",Integer.toString(mYear));
+                map.put("month",Integer.toString(mMonth));
+                map.put("day",Integer.toString(mDay));
+                map.put("targetMoney",Integer.toString(targetMoney));
+                Log.d("test",nameText);
+                //放要傳到servlet的資料
+                return map;
+            }
+        };
+        queue.toString();
+        queue.add(stringRequest);   //把request丟進queue(佇列)
     }
 
     public void removeData(int position) {
@@ -423,6 +617,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             pref.edit()
                     .clear()
                     .commit();
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("userID"+userID);
             Intent intent = new Intent();
             intent.setClass(HomePage.this, Login.class);
             startActivity(intent);
@@ -530,6 +725,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                         }else{
                             Intent intent = new Intent();
                             intent.setClass(HomePage.this, MainTallyBook.class);
+                            intent.putExtra("back","No");   //推播返回鍵判斷
                             startActivity(intent);
                             finish();
 

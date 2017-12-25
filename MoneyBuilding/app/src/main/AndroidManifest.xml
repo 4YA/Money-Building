@@ -11,6 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!-- [START fcm_default_icon] -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/logo" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorGray" />
+        <!-- [END fcm_default_icon] -->
         <activity android:name=".Welcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +47,15 @@
             android:label="基本資料" />
         <activity android:name=".MainTallyBook" />
         <activity android:name=".EditBookList"></activity>
+
+        <!-- [START firebase_service] -->
+        <service
+            android:name=".MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <!-- [END firebase_service] -->
     </application>
 
 </manifest>

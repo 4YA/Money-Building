@@ -291,10 +291,15 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode == KeyEvent.KEYCODE_BACK) { // 攔截返回鍵
-            Intent intent = new Intent();
-            intent.setClass(MainTallyBook.this, HomePage.class);
-            startActivity(intent);
-            finish();
+            Bundle bundle = this.getIntent().getExtras();
+            if(bundle.getString("back").equals("Yes")) {
+                finish();
+            }else {
+                Intent intent = new Intent();
+                intent.setClass(MainTallyBook.this, HomePage.class);
+                startActivity(intent);
+                finish();
+            }
         }
         return true;
     }

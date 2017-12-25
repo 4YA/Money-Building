@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1052811119319",
+    "firebase_url": "https://moneybuilding-887a2.firebaseio.com",
+    "project_id": "moneybuilding-887a2",
+    "storage_bucket": "moneybuilding-887a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052811119319:android:01477ae67fe2b632",
+        "android_client_info": {
+          "package_name": "com.example.user.moneybuilding"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1052811119319-r5dd069pd0gqsrb8pgfeufjc4aci8a4c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.moneybuilding",
+            "certificate_hash": "5d1725f7665c9bda3c9d46747a9cc6923edd1fe0"
+          }
+        },
+        {
+          "client_id": "1052811119319-0fas74306b143fmkgsrmt92lghkidv23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqk7T4WdXimXRVG9EZ1Nt2Nsc7pfXs9OY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1052811119319-0fas74306b143fmkgsrmt92lghkidv23.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

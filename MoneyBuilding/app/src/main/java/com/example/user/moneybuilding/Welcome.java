@@ -9,16 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class Welcome extends AppCompatActivity {
     private Button btn;
@@ -36,8 +26,24 @@ public class Welcome extends AppCompatActivity {
             Intent intent = new Intent();
             if(pref.getString("userID" , "0").equals("0"))
                 intent.setClass(Welcome.this, Login.class);
-            else
-                intent.setClass(Welcome.this, HomePage.class);
+            else {
+                Bundle bundle = getIntent().getExtras();
+                if (bundle != null && bundle.get("title")!=null) {
+                    switch (bundle.get("tag").toString()){
+                        case "addMember":
+                            intent.setClass(Welcome.this, MainTallyBook.class);
+                            break;
+                        case "goalAchieved":
+                            intent.setClass(Welcome.this, MainTallyBook.class);
+                            break;
+                        default:
+                            Log.v("switch","default");
+                            intent.setClass(Welcome.this, HomePage.class);
+                    }
+                } else {
+                    intent.setClass(Welcome.this, HomePage.class);
+                }
+            }
             startActivity(intent);
             finish();
         }
