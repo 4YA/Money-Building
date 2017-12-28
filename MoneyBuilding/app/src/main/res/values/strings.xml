@@ -17,4 +17,7 @@
     <string name="buttom_6_name">電信</string>
     <string name="buttom_7_name">醫療</string>
     <string name="buttom_8_name">其他</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

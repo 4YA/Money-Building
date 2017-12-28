@@ -11,10 +11,10 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/edit_item"
-        android:icon="@drawable/ic_mode_edit_black_24dp"
+        android:id="@+id/plus_item"
+        android:icon="@drawable/ic_event_note_black_24dp"
         android:orderInCategory="100"
-        android:title="編輯帳目"
+        android:title="新紀錄"
         app:showAsAction="never" />
 
 

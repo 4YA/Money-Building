@@ -16,11 +16,34 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.example.user.moneybuilding.LockableViewPager
+            android:id="@+id/photosViewPager"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"/>
+
+    </LinearLayout>
+
+
+
     <!-- Main Content -->
     <include layout="@layout/content_tallybook" />
 
+
     <!-- Bottom Sheet Content -->
     <include layout="@layout/content_button_sheet" />
+
 
 
 </android.support.design.widget.CoordinatorLayout>

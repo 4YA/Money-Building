@@ -1,18 +1,27 @@
 package com.example.user.moneybuilding;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -22,7 +31,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
@@ -30,7 +41,7 @@ import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 public class MainTallyBook extends AppCompatActivity implements View.OnClickListener{
 
-    private BottomSheetBehavior bottomSheetBehavior;
+    public BottomSheetBehavior bottomSheetBehavior;
 
     // TextView variable
     private TextView bottomSheetHeading;
@@ -48,9 +59,14 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
     private RadioGroup endDate;
     private RadioButton endDateYes;
+    private RadioButton endDateNo;
+    private TextView showDate;
     private RadioGroup target;
     private RadioButton targetYes;
+    private RadioButton targetNo;
+    private TextView showTarget;
     private int mYear, mMonth, mDay;
+    private LockableViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +75,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
         initViews();
         initListeners();
+
+        initToolbar();
+        initTabLayout();
 
         FabSpeedDial fabSpeedDial = (FabSpeedDial) findViewById(R.id.fab_speed_dial);
         fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
@@ -71,8 +90,12 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
                         endDate = (RadioGroup) dialogName.findViewById(R.id.endDate);
                         endDateYes = (RadioButton) dialogName.findViewById(R.id.endDateYes);
+                        endDateNo = (RadioButton) dialogName.findViewById(R.id.endDateNo);
                         target = (RadioGroup) dialogName.findViewById(R.id.target);
                         targetYes = (RadioButton) dialogName.findViewById(R.id.targetYes);
+                        targetNo = (RadioButton) dialogName.findViewById(R.id.targetNo);
+                        showTarget=(TextView) dialogName.findViewById(R.id.show_target_money);
+                        showDate=(TextView) dialogName.findViewById(R.id.show_date);
                         endDate.setOnCheckedChangeListener(listenerEndDate);
                         target.setOnCheckedChangeListener(listenerTarget);
 
@@ -104,11 +127,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                                 })
                                 .show();
                         return true;
-                    case R.id.edit_item:
-                        Intent intent = new Intent();
-                        intent.setClass(MainTallyBook.this, EditBookList.class);
-                        startActivity(intent);
-                        finish();
+                    case R.id.plus_item:
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         return true;
                 }
 
@@ -116,6 +136,26 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                 return false;
             }
         });
+    }
+
+    private void initToolbar() {
+
+        getSupportActionBar().setTitle("Money Building");
+    }
+
+    private void initTabLayout(){
+        mViewPager = (LockableViewPager) findViewById(R.id.photosViewPager);
+        mViewPager.setSwipeable(false);
+
+
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+//        adapter.addFragment(new TabFragment(), "Title 1");
+//        adapter.addFragment(new TabFragment(), "Title 2");
+
+        mViewPager.setAdapter(adapter);
+
+        TabLayout mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     private void initViews() {
@@ -127,8 +167,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         cancelBottomSheetButton = (Button) findViewById(R.id.cancelButton);
         showItem=(TextView) findViewById(R.id.moneyItem);
 
-        bottomSheetHeading.setText("+新紀錄");
-        bottomSheetHeading.setGravity(Gravity.CENTER);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        //bottomSheetHeading.setText("+新紀錄");
+        //bottomSheetHeading.setGravity(Gravity.CENTER);
         initItemBotton();
 
     }
@@ -158,6 +199,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if(endDateYes.isChecked()){
+                showDate.setVisibility( View.VISIBLE );
                 final Calendar c = Calendar.getInstance();
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
@@ -165,11 +207,20 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                 new DatePickerDialog(MainTallyBook.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
-
+                        mYear = year;
+                        mMonth = month+1;
+                        mDay = day;
+                        String dateText=mYear+"/"+mMonth+"/"+mDay;
+                        showDate.setText(dateText);
                     }
 
                 }, mYear,mMonth, mDay)
                         .show();
+
+            }
+            if(endDateNo.isChecked()){
+                showDate.setText("");
+                showDate.setVisibility( View.GONE );
             }
         }
     };
@@ -177,8 +228,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private RadioGroup.OnCheckedChangeListener listenerTarget = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
-            //Log.d("myTag", "This is my message"+endDateYes.isChecked());
             if(targetYes.isChecked()){
+                showTarget.setVisibility( View.VISIBLE );
                 LayoutInflater inflater = LayoutInflater.from(MainTallyBook.this);
                 final View dialogName = inflater.inflate(R.layout.target_money, null);
                 new AlertDialog.Builder(MainTallyBook.this)
@@ -187,10 +238,15 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                         .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                EditText editTargetMoney =   (EditText) dialogName.findViewById(R.id.moneyInput);
+                                showTarget.setText("$"+editTargetMoney.getText());
                             }
                         })
                         .show();
+            }
+            if(targetNo.isChecked()){
+                showTarget.setText("");
+                showTarget.setVisibility( View.GONE );
             }
 
         }
@@ -240,6 +296,10 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
     }
 
+    public void open(){
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
     /**
      * onClick Listener to capture button click
      *
@@ -276,15 +336,16 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 break;
             case R.id.cancelButton:
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 break;
             case R.id.OKbutton:
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 break;
 
 
         }
     }
+
 
 
     @Override
@@ -302,5 +363,39 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
             }
         }
         return true;
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+            mFragmentList.add(new GameFrgTab());
+            mFragmentList.add(new EditBookList());
+
+            mFragmentTitleList.add("遊戲畫面");
+            mFragmentTitleList.add("我的帳目");
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 }

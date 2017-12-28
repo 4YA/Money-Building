@@ -18,11 +18,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="是否設立結束日期"/>
+    <TextView
+        android:id="@+id/show_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text=""/>
     <RadioGroup
         android:id="@+id/endDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <RadioButton
             android:id="@+id/endDateYes"
             android:layout_width="wrap_content"
@@ -40,6 +47,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="選擇是否為目標帳本"/>
+    <TextView
+        android:id="@+id/show_target_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text=""/>
     <RadioGroup
         android:id="@+id/target"
         android:layout_width="wrap_content"

@@ -76,7 +76,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private List<String> mDatas = new ArrayList<String>();
     private int mYear, mMonth, mDay;
 
-    private FloatingActionButton fab;
+    private RadioButton targetNo;
+    private RadioButton endDateNo;
+    private TextView showDate;
+    private TextView showTarget;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,6 +217,10 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             targetYes = (RadioButton) dialogName.findViewById(R.id.targetYes);
                             endDate.setOnCheckedChangeListener(listenerEndDate);
                             target.setOnCheckedChangeListener(listenerTarget);
+                            targetNo = (RadioButton) dialogName.findViewById(R.id.targetNo);
+                            endDateNo = (RadioButton) dialogName.findViewById(R.id.endDateNo);
+                            showDate=(TextView) dialogName.findViewById(R.id.show_date);
+                            showTarget=(TextView) dialogName.findViewById(R.id.show_target_money);
 
                             new AlertDialog.Builder(HomePage.this)
                                     .setTitle("新增帳本")
@@ -480,6 +488,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             if(endDateYes.isChecked()){
+                showDate.setVisibility( View.VISIBLE );
                 final Calendar c = Calendar.getInstance();
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
@@ -490,10 +499,17 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 							mYear = year;
                             mMonth = month+1;
                             mDay = day;
+                            String dateText=mYear+"/"+mMonth+"/"+mDay;
+                            showDate.setText(dateText);
                     }
 
                 }, mYear,mMonth, mDay)
                         .show();
+
+            }
+            if(endDateNo.isChecked()){
+                showDate.setText("");
+                showDate.setVisibility( View.GONE );
             }
         }
     };
@@ -503,6 +519,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             //Log.d("myTag", "This is my message"+endDateYes.isChecked());
             if(targetYes.isChecked()){
+                showTarget.setVisibility( View.VISIBLE );
                 LayoutInflater inflater = LayoutInflater.from(HomePage.this);
                 final View dialogName = inflater.inflate(R.layout.target_money, null);
                 new AlertDialog.Builder(HomePage.this)
@@ -515,10 +532,15 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 EditText editTargetMoney =   (EditText) dialogName.findViewById(R.id.moneyInput);
  
                                 targetMoney =  Integer.parseInt(editTargetMoney.getText().toString());
+                                showTarget.setText("$"+editTargetMoney.getText());
 
                             }
                         })
                         .show();
+            }
+            if(targetNo.isChecked()){
+                showTarget.setText("");
+                showTarget.setVisibility( View.GONE );
             }
 
         }
