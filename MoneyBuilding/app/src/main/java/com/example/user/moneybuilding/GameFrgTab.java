@@ -36,7 +36,7 @@ public class GameFrgTab extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.frg_tab, container, false);
-        memberView = inflater.inflate(R.layout.show_member, container, false);
+        //memberView = inflater.inflate(R.layout.show_member, container, false);
 
         member = (Button) rootView.findViewById(R.id.push_button);
 
@@ -46,10 +46,14 @@ public class GameFrgTab extends Fragment {
 
             @Override
             public void onClick(View v) {
-
                 LayoutInflater inflater = LayoutInflater.from(getContext());
-                //final View memberV = inflater.inflate(R.layout.show_member, null);
+                final View memberView = inflater.inflate(R.layout.show_member, null);
 
+                mGameListView = (SwipeMenuListView) memberView.findViewById(R.id.memberListView);
+                if(mGameAdapter==null){
+                    return;
+                }
+                mGameListView.setAdapter(mGameAdapter);
                 new AlertDialog.Builder(getContext())
                         .setTitle("帳本成員")
                         .setView(memberView)
@@ -67,12 +71,13 @@ public class GameFrgTab extends Fragment {
 
         return rootView;
     }
-    public void createMember(String name){
-        mGameListView = (SwipeMenuListView) memberView.findViewById(R.id.memberListView);
-        mGameAdapter = new AppAdapter(mGameAppList);
-        mGameListView.setAdapter(mGameAdapter);
+    public void createMember(String name){//String name
 
-        mGameAppList.add(name);
+
+        mGameAdapter = new AppAdapter(mGameAppList);
+
+
+        mGameAppList.add(name);//name
         mGameAdapter.notifyDataSetChanged();
 
 
