@@ -41,11 +41,12 @@ public class GameFrgTab extends Fragment {
         member = (Button) rootView.findViewById(R.id.push_button);
 
 
+
         member.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                createMember();
+
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 //final View memberV = inflater.inflate(R.layout.show_member, null);
 
@@ -66,15 +67,15 @@ public class GameFrgTab extends Fragment {
 
         return rootView;
     }
-    private void createMember(){
+    public void createMember(String name){
         mGameListView = (SwipeMenuListView) memberView.findViewById(R.id.memberListView);
         mGameAdapter = new AppAdapter(mGameAppList);
         mGameListView.setAdapter(mGameAdapter);
-        for(int i=0;i<10;i++){
-            mGameAppList.add("姓名");
-            mGameAdapter.notifyDataSetChanged();
 
-        }
+        mGameAppList.add(name);
+        mGameAdapter.notifyDataSetChanged();
+
+
     }
 
 
