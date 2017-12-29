@@ -48,7 +48,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -81,16 +80,13 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private RadioButton endDateNo;
     private TextView showDate;
     private TextView showTarget;
-    private ArrayList<String> tallyBookIDArr; //帳本ID
-    private ArrayList<String> tallyBookNameArr; //'帳本名稱
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mYear =  mMonth = mDay = 0;
         targetMoney = 0;
-        tallyBookIDArr = new ArrayList<String>();
-        tallyBookNameArr = new ArrayList<String>();
         //startActivity(new Intent(HomePage.this,ListViewActivity.class));
         setContentView(R.layout.activity_home_page);
         queue = Volley.newRequestQueue(this);
@@ -137,8 +133,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             JSONArray arr = new JSONArray(response);
                             for(int s=0;s<arr.length();s++){
                                 addData(1);
-                                JSONObject temp = arr.getJSONObject(s);
-                                getTallyBookFromServer(temp);
                             }
                         } catch (Throwable t) {
                         }
@@ -176,12 +170,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-    }
-
-    public void getTallyBookFromServer(JSONObject temp) throws JSONException {
-        tallyBookIDArr.add(temp.getString("tallyBookID"));
-        tallyBookNameArr.add(temp.getString("tallyBookName"));
-        Log.d("tallyBookID",temp.getString("tallyBookID"));
     }
     public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -335,7 +323,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                                                                 alertDialog.show();
                                                                             }
                                                                             else{
-                                                                                getTallyBookFromServer(obj);
+
                                                                                 AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
                                                                                 d1.setTitle("提醒");
                                                                                 d1.setMessage("加入成功!");
@@ -443,7 +431,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                         alertDialog.show();
                                     }
                                     else{
-                                        getTallyBookFromServer(obj);
+
                                         AlertDialog.Builder d1 = new AlertDialog.Builder(HomePage.this);
                                         d1.setTitle("提醒");
                                         d1.setMessage("加入成功!");
@@ -591,14 +579,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        JSONObject obj = null;
-                        try {
-                            obj = new JSONObject(response);
-                            getTallyBookFromServer(obj);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
+                        //收到的資料
                     }
 
                 }, new Response.ErrorListener() {
@@ -632,39 +613,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         mDatas.remove(position);
         mAdapter.notifyItemRemoved(position);
     }
-
-    public void removeFromServer(final String ID){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/LeaveTallyBookServlet",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //收到的資料
-                    }
-
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {    //錯誤訊息
-                //如果沒連成功錯誤會到這裡
-                Log.d("connection error",error.toString());
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String,String> map = new HashMap<String, String>();
-
-                map.put("state", "LeaveTallyBook");
-                map.put("userID",  getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
-                map.put("tallyBookID", ID);
-                //放要傳到servlet的資料
-                return map;
-            }
-        };
-        queue.toString();
-        queue.add(stringRequest);   //把request丟進queue(佇列)
-    }
-
 
 
 
@@ -790,11 +738,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 @Override
                                 public void onClick(DialogInterface arg0, int arg1) {
                                     int index = getLayoutPosition();
-
-                                     removeFromServer(tallyBookIDArr.get(index));
-
                                     removeData(index);
-
 
                                 }
                             });
@@ -803,12 +747,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                         }else{
                             Intent intent = new Intent();
                             intent.setClass(HomePage.this, MainTallyBook.class);
-                            Bundle bundle = new Bundle();
-                            int index = getLayoutPosition();
-                            bundle.putString("tallyBookID",tallyBookIDArr.get(index));
-                            bundle.putString("back","No");
-                            //將Bundle物件assign給intent
-                            intent.putExtras(bundle);
+                            intent.putExtra("back","No");   //推播返回鍵判斷
                             startActivity(intent);
                             finish();
 
