@@ -27,13 +27,27 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
@@ -67,11 +81,51 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private TextView showTarget;
     private int mYear, mMonth, mDay;
     private LockableViewPager mViewPager;
+    private String tallyBookID;
+    private RequestQueue queue;
+    private Fragment game;
+    private ArrayList<String> memberName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tally_book);
+        Bundle bundle =this.getIntent().getExtras();
+        game = new GameFrgTab();
+        queue = Volley.newRequestQueue(this);
+        tallyBookID = bundle.getString("tallyBookID");
+        memberName = new ArrayList<String>();
+        StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+
+                            for(int i=0;i<arr.length();i++){
+
+                                ((GameFrgTab)game).createMember((String)arr.get(i));
+                                memberName.add((String)arr.get(i));
+                            }
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "getTallyBookMember");
+                map.put("tallyBookID", tallyBookID);
+                return map;
+            }
+        };
+
+        queue.add(request);
+
 
         initViews();
         initListeners();
@@ -162,7 +216,6 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
 
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottomSheetLayout));
-        bottomSheetHeading = (TextView) findViewById(R.id.bottomSheetHeading);
         OKBottomSheetButton = (Button) findViewById(R.id.OKbutton);
         cancelBottomSheetButton = (Button) findViewById(R.id.cancelButton);
         showItem=(TextView) findViewById(R.id.moneyItem);
@@ -257,7 +310,6 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
      */
     private void initListeners() {
         // register the listener for button click
-        bottomSheetHeading.setOnClickListener(this);
         OKBottomSheetButton.setOnClickListener(this);
         cancelBottomSheetButton.setOnClickListener(this);
 
@@ -265,14 +317,6 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(View bottomSheet, int newState) {
-
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetHeading.setText("新增帳目");
-                    bottomSheetHeading.setGravity(Gravity.LEFT);
-                }else{
-                    bottomSheetHeading.setText("+新紀錄");
-                    bottomSheetHeading.setGravity(Gravity.CENTER);
-                }
 
                 // Check Logs to see how bottom sheets behaves
                 switch (newState) {
@@ -332,9 +376,6 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
             case R.id.imageButton8:
                 showItem.setText(R.string.buttom_8_name);
                 break;
-            case R.id.bottomSheetHeading:
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                break;
             case R.id.cancelButton:
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 break;
@@ -371,7 +412,10 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
-            mFragmentList.add(new GameFrgTab());
+
+
+
+            mFragmentList.add(game);
             mFragmentList.add(new EditBookList());
 
             mFragmentTitleList.add("遊戲畫面");
