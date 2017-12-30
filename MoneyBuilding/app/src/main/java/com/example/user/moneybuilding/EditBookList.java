@@ -29,15 +29,10 @@ public class EditBookList extends Fragment {
     private AppAdapter mAdapter;
     private SwipeMenuListView mListView;
 
-    private void loadData(){
-        String item="項目";
-        String money="金錢";
-        String content="內容";
-        String date="日期";
-        for (int i = 0; i < 10; i++) {
-            mAppList.add(date+" "+money+" "+item+" "+content);
+    public void loadData(String type,String date,String money,String content){
+        //type 為它的型態 要幫他修改圖片
+            mAppList.add(date+" "+content+" "+money);
             mAdapter.notifyDataSetChanged();
-        }
     }
 
     private View rootView;
@@ -52,7 +47,7 @@ public class EditBookList extends Fragment {
         mListView.setAdapter(mAdapter);
        // initViews();
        // initListeners();
-        loadData();
+
 
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {

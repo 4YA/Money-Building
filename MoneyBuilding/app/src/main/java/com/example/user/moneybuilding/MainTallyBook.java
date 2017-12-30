@@ -83,7 +83,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private LockableViewPager mViewPager;
     private String tallyBookID;
     private RequestQueue queue;
-    private Fragment game;
+    private GameFrgTab game;
+    private EditBookList recordList;
     private ArrayList<String> memberName;
 
     @Override
@@ -92,7 +93,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_main_tally_book);
         Bundle bundle =this.getIntent().getExtras();
         game = new GameFrgTab();
+        recordList = new EditBookList();
         queue = Volley.newRequestQueue(this);
+
         tallyBookID = bundle.getString("tallyBookID");
         memberName = new ArrayList<String>();
         StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
@@ -104,7 +107,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
                             for(int i=0;i<arr.length();i++){
 
-                                ((GameFrgTab)game).createMember((String)arr.get(i));
+                                game.createMember((String)arr.get(i));
                                 memberName.add((String)arr.get(i));
                             }
                         } catch (Throwable t) {
@@ -381,6 +384,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.OKbutton:
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+                addRecordToServer();
                 break;
 
 
@@ -388,6 +393,77 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     }
 
 
+    public void  addRecordToServer(){
+        EditText moneyText = (EditText)findViewById(R.id.moneyText);
+        String money = moneyText.getText().toString();
+        EditText editMoneyItem = (EditText)findViewById(R.id.editMoneyItem);
+        final  String edit  = editMoneyItem.getText().toString();
+        final String type = showItem.getText().toString();
+        final String mmoney;
+        if(money == null){
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainTallyBook.this);
+            alertDialog.setTitle("提醒");
+            alertDialog.setMessage("請輸入金額!");
+            alertDialog.setPositiveButton("知道了", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                }
+            });
+            alertDialog.show();
+            return;
+        }
+
+        if(type!="收入")
+            mmoney = "-"+money;
+        else
+            mmoney = money;
+
+
+        final Calendar c = Calendar.getInstance();
+        String year = Integer.toString(c.get(Calendar.YEAR));
+        String month = Integer.toString(c.get(Calendar.MONTH));
+        String day = Integer.toString(c.get(Calendar.DATE));
+
+        recordList.loadData(type,year+"/"+month+"/"+day,money,edit);
+
+        StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"AddRecordServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+
+                            for(int i=0;i<arr.length();i++){
+
+                                game.createMember((String)arr.get(i));
+                                memberName.add((String)arr.get(i));
+                            }
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "newRecord");
+                map.put("tallyBookID", tallyBookID);
+                map.put("money", mmoney);
+                map.put("edit", edit);
+                map.put("type", type);
+                map.put("userID",  getSharedPreferences("data", MODE_PRIVATE).getString("userID",""));
+                map.put("public",  "0");
+
+                return map;
+            }
+        };
+
+        queue.add(request);
+
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -416,7 +492,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
 
 
             mFragmentList.add(game);
-            mFragmentList.add(new EditBookList());
+            mFragmentList.add(recordList);
 
             mFragmentTitleList.add("遊戲畫面");
             mFragmentTitleList.add("我的帳目");
