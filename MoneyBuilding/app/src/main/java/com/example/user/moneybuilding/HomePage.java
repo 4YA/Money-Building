@@ -697,15 +697,16 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             startActivity(intent);
             finish();
 
-        } else if (id == R.id.nav_tallybook) {
-
         } else if (id == R.id.nav_user) {
             Intent intent = new Intent();
             intent.setClass(HomePage.this, PersonalInformation.class);
             startActivity(intent);
             finish();
         } else if (id == R.id.nav_manage) {
-
+            Intent intent = new Intent();
+            intent.setClass(HomePage.this, Setting.class);
+            startActivity(intent);
+            finish();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

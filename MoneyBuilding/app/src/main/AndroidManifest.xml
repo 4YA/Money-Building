@@ -56,6 +56,7 @@
         </service>
         <!-- [END firebase_service] -->
 
+        <activity android:name=".Setting"></activity>
     </application>
 
 </manifest>

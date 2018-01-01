@@ -28,19 +28,28 @@ public class Welcome extends AppCompatActivity {
                 intent.setClass(Welcome.this, Login.class);
             else {
                 Bundle bundle = getIntent().getExtras();
+                Log.v("1","1");
                 if (bundle != null && bundle.get("title")!=null) {
+                    Log.v("2","1");
                     switch (bundle.get("tag").toString()){
-                        case "addMember":
+                        case "addMember":{
+                            Bundle temp = new Bundle();
+                            bundle.putString("tallyBookID",bundle.get("id").toString());
+                            intent.putExtras(bundle);
                             intent.setClass(Welcome.this, MainTallyBook.class);
-                            break;
-                        case "goalAchieved":
+                            break;}
+                        case "goalAchieved":{
+                            Bundle temp = new Bundle();
+                            bundle.putString("tallyBookID",bundle.get("id").toString());
+                            intent.putExtras(bundle);
                             intent.setClass(Welcome.this, MainTallyBook.class);
-                            break;
+                            break;}
                         default:
-                            Log.v("switch","default");
+                            Log.v("switch","null");
                             intent.setClass(Welcome.this, HomePage.class);
                     }
                 } else {
+                    Log.v("4","homepage");
                     intent.setClass(Welcome.this, HomePage.class);
                 }
             }

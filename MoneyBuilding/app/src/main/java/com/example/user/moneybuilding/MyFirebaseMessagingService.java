@@ -17,12 +17,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService{
                 case "addMember": {
                     intent.setClass(this, MainTallyBook.class);
                     intent.putExtra("back","Yes");
-                    intent.putExtra("id",remoteMessage.getData().get("id"));
+                    intent.putExtra("tallyBookID",remoteMessage.getData().get("id"));
                 }break;
                 case "goalAchieved": {
                     intent.setClass(this, MainTallyBook.class);
                     intent.putExtra("back","Yes");
-                    intent.putExtra("id",remoteMessage.getData().get("id"));
+                    intent.putExtra("tallyBookID",remoteMessage.getData().get("id"));
                 }break;
                 default: {
                     Log.v("switch", "default");

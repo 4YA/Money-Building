@@ -5,10 +5,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_tallybook"
-            android:icon="@drawable/coins2"
-            android:title="我的帳本" />
-        <item
             android:id="@+id/nav_user"
             android:icon="@drawable/user"
             android:title="基本資料" />
