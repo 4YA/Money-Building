@@ -1,7 +1,6 @@
 package com.example.user.moneybuilding;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.BottomSheetBehavior;
@@ -9,20 +8,17 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -38,10 +34,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +45,7 @@ import java.util.Map;
 
 import io.github.yavski.fabspeeddial.FabSpeedDial;
 import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
+
 
 
 public class MainTallyBook extends AppCompatActivity implements View.OnClickListener{
@@ -517,5 +512,55 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tally_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_qrcode) {
+            // do something here
+            showQRCodeModal();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showQRCodeModal() {
+        RequestQueue q = Volley.newRequestQueue(this);
+        StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+                            WebView myWebView = new WebView(MainTallyBook.this);
+                            myWebView.loadUrl(arr.get(1).toString());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainTallyBook.this);
+                            builder.setTitle(arr.get(0).toString())
+                                    .setView(myWebView)
+                                    .setIcon(R.drawable.qrcode3)
+                                    .setPositiveButton("OK", null)
+                                    .show();
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "showTallyBookQRCode");
+                map.put("tallyBookID", tallyBookID);
+                return map;
+            }
+        };
+        q.add(request);
     }
 }
