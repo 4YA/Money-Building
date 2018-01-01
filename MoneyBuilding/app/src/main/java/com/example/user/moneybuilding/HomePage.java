@@ -493,7 +493,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
     public void changeBack(){
             deleteButton=false;
-            changePicture(R.drawable.plus,"#FF4081");
+            changePicture(R.drawable.plus,"#ffffff");
     }
 
     private RadioGroup.OnCheckedChangeListener listenerEndDate = new RadioGroup.OnCheckedChangeListener() {
