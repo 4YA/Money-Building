@@ -36,6 +36,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,6 +83,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private GameFrgTab game;
     private EditBookList recordList;
     private ArrayList<String> memberName;
+    private int targetMoney = 0;
+    private int balance = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +96,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         queue = Volley.newRequestQueue(this);
 
         tallyBookID = bundle.getString("tallyBookID");
+        balance = Integer.parseInt(bundle.getString("tallyBookMoney"));
         memberName = new ArrayList<String>();
         StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
                 new Response.Listener<String>() {
@@ -122,13 +127,46 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
             }
         };
 
+
+
+        StringRequest request2 = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetRecordServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray arr = new JSONArray(response);
+
+                            for(int i=0;i<arr.length();i++){
+                                JSONObject temp = arr.getJSONObject(i);
+                                Log.d("SS",temp.toString());
+                                getRecordFromServer(temp);
+                            }
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "getRecord");
+                map.put("tallyBookID", tallyBookID);
+                return map;
+            }
+        };
+
         queue.add(request);
+        queue.add(request2);
 
 
         initViews();
         initListeners();
 
-        initToolbar();
+        initToolbar(bundle.getString("tallyBookName"));
+        Log.d("balance",((Integer)balance).toString());
         initTabLayout();
 
         FabSpeedDial fabSpeedDial = (FabSpeedDial) findViewById(R.id.fab_speed_dial);
@@ -175,6 +213,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                                             alertDialog.show();
 
                                         }
+                                        else{
+                                            editTallyBook(nameText.getText().toString());
+                                        }
                                     }
                                 })
                                 .show();
@@ -190,9 +231,48 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         });
     }
 
-    private void initToolbar() {
+    private void initToolbar(String name) {
+        getSupportActionBar().setTitle(name);
+    }
 
-        getSupportActionBar().setTitle("Money Building");
+    public void getRecordFromServer(JSONObject temp) throws JSONException {
+        recordList.loadData(temp.getString("type"),temp.getString("dateTime"),temp.getString("money"),temp.getString("content"));
+    }
+
+    public void editTallyBook(final String nameText){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/EditTallyBookServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        initToolbar(nameText);
+                    }
+
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+                //如果沒連成功錯誤會到這裡
+                Log.d("connection error",error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> map = new HashMap<String, String>();
+
+                map.put("state", "editTallyBook");
+                map.put("tallyBookID",  tallyBookID);
+                map.put("name",nameText);
+                map.put("year",Integer.toString(mYear));
+                map.put("month",Integer.toString(mMonth));
+                map.put("day",Integer.toString(mDay));
+                map.put("targetMoney",Integer.toString(targetMoney));
+
+                //放要傳到servlet的資料
+                return map;
+            }
+        };
+
+        queue.add(stringRequest);   //把request丟進queue(佇列)
     }
 
     private void initTabLayout(){
@@ -259,7 +339,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
                         mYear = year;
-                        mMonth = month+1;
+                        month += 1;
+                        mMonth = month;
                         mDay = day;
                         String dateText=mYear+"/"+mMonth+"/"+mDay;
                         showDate.setText(dateText);
@@ -290,6 +371,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 EditText editTargetMoney =   (EditText) dialogName.findViewById(R.id.moneyInput);
+
+                                targetMoney =  Integer.parseInt(editTargetMoney.getText().toString());
                                 showTarget.setText("$"+editTargetMoney.getText());
                             }
                         })

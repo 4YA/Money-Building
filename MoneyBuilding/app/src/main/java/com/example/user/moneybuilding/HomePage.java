@@ -83,7 +83,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private TextView showTarget;
     private ArrayList<String> tallyBookIDArr; //帳本ID
     private ArrayList<String> tallyBookNameArr; //'帳本名稱
-
+    private ArrayList<String> tallyBookMoneyArr; //'帳本金錢
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +91,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         targetMoney = 0;
         tallyBookIDArr = new ArrayList<String>();
         tallyBookNameArr = new ArrayList<String>();
+        tallyBookMoneyArr = new ArrayList<String>();
         //startActivity(new Intent(HomePage.this,ListViewActivity.class));
         setContentView(R.layout.activity_home_page);
         queue = Volley.newRequestQueue(this);
@@ -138,6 +139,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             for(int s=0;s<arr.length();s++){
                                 addData(1);
                                 JSONObject temp = arr.getJSONObject(s);
+
                                 getTallyBookFromServer(temp);
                             }
                         } catch (Throwable t) {
@@ -181,8 +183,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public void getTallyBookFromServer(JSONObject temp) throws JSONException {
         tallyBookIDArr.add(temp.getString("tallyBookID"));
         tallyBookNameArr.add(temp.getString("tallyBookName"));
-        Log.d("tallyBookID",temp.getString("tallyBookID"));
+        tallyBookMoneyArr.add(temp.getString("tallyBookMoney"));
     }
+
     public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
 
         private int space;
@@ -807,6 +810,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             Bundle bundle = new Bundle();
                             int index = getLayoutPosition();
                             bundle.putString("tallyBookID",tallyBookIDArr.get(index));
+                            bundle.putString("tallyBookName", tallyBookNameArr.get(index));
+                            bundle.putString("tallyBookMoney", tallyBookMoneyArr.get(index));
                             bundle.putString("back","No");
                             //將Bundle物件assign給intent
                             intent.putExtras(bundle);
