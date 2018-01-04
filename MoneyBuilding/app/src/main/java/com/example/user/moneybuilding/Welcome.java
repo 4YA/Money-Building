@@ -1,17 +1,14 @@
 package com.example.user.moneybuilding;
 
 import android.content.Intent;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Button;
 
 
 public class Welcome extends AppCompatActivity {
-    private Button btn;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
