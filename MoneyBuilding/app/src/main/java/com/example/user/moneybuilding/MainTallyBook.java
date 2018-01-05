@@ -236,8 +236,11 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     }
 
     public void getRecordFromServer(JSONObject temp) throws JSONException {
+        recordList.pushRecordID(temp.getString("recordID"));
         recordList.loadData(temp.getString("type"),temp.getString("dateTime"),temp.getString("money"),temp.getString("content"));
+
     }
+
 
     public void editTallyBook(final String nameText){
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -491,16 +494,16 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
             return;
         }
 
-        if(type!="收入")
-            mmoney = "-"+money;
-        else
+        if(type.equals("收入"))
             mmoney = money;
+        else
+            mmoney = "-"+money;
 
 
         final Calendar c = Calendar.getInstance();
         String year = Integer.toString(c.get(Calendar.YEAR));
-        String month = Integer.toString(c.get(Calendar.MONTH));
-        String day = Integer.toString(c.get(Calendar.DATE));
+        String month = Integer.toString(c.get(Calendar.MONTH)+1);
+        String day = Integer.toString(c.get(Calendar.DATE)+1);
 
         recordList.loadData(type,year+"/"+month+"/"+day,money,edit);
 
@@ -509,13 +512,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onResponse(String response) {
                         try {
-                            JSONArray arr = new JSONArray(response);
 
-                            for(int i=0;i<arr.length();i++){
 
-                                game.createMember((String)arr.get(i));
-                                memberName.add((String)arr.get(i));
-                            }
+
                         } catch (Throwable t) {
                         }
                     }

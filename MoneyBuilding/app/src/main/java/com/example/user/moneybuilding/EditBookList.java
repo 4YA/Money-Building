@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -14,13 +15,25 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+
 
 public class EditBookList extends Fragment {
 
@@ -28,18 +41,28 @@ public class EditBookList extends Fragment {
     private List<String> mAppList = new ArrayList<String>();
     private AppAdapter mAdapter;
     private SwipeMenuListView mListView;
+    private ArrayList<String> recordID = new ArrayList<String>();
+    private RequestQueue queue;
+
 
     public void loadData(String type,String date,String money,String content){
-        //type 為它的型態 要幫他修改圖片
             mAppList.add(date+" "+content+" "+money);
             mAdapter.notifyDataSetChanged();
     }
 
+    public void pushRecordID(String id){
+        recordID.add(id);
+    }
+
+
     private View rootView;
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
         rootView = inflater.inflate(R.layout.activity_edit_book_list, container, false);
         
         mListView = (SwipeMenuListView) rootView.findViewById(R.id.listView);
@@ -47,7 +70,7 @@ public class EditBookList extends Fragment {
         mListView.setAdapter(mAdapter);
        // initViews();
        // initListeners();
-
+        queue = Volley.newRequestQueue(this.getContext());
 
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -86,6 +109,9 @@ public class EditBookList extends Fragment {
                         break;
                     case 1:
                         mAppList.remove(position);
+                        Log.d("WW",((Integer)position).toString());
+                        deleteDataFromServer(recordID.get(position));
+                        recordID.remove(position);
                         mAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -94,6 +120,33 @@ public class EditBookList extends Fragment {
         });
 
         return rootView;
+    }
+    public void deleteDataFromServer(final String recordID) {
+
+        StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/" + "DeleteRecordServlet",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                        } catch (Throwable t) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            // @Override
+            public void onErrorResponse(VolleyError error) {    //錯誤訊息
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("state", "deleteRecord");
+                map.put("recordID", recordID);
+                return map;
+            }
+        };
+
+        queue.add(request);
     }
 
 
