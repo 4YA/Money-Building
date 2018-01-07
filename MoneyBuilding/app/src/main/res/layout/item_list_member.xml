@@ -22,25 +22,7 @@
         android:textColor="@android:color/black"
         android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/tv_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="57dp"
-        android:layout_toEndOf="@+id/tv_name"
-        android:text="content"
-        android:textColor="@android:color/black"
-        android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:text="2018/1/7"
-        android:textColor="@android:color/darker_gray" />
+
 
 </RelativeLayout>

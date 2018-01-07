@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,7 +12,8 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        android:id="@+id/linearLayout2">
         <Button
             android:id="@+id/push_button"
             android:layout_width="50dp"
@@ -19,6 +22,29 @@
             android:padding="15dp"
             android:text="" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="23dp"
+        android:layout_marginStart="23dp"
+        android:lines="3"
+        android:background="@color/cardview_shadow_end_color"
+        android:backgroundTint="@color/cardview_shadow_end_color"
+        android:text="目前資金:10000預期資金:50000房子等級: 1"
+        android:textColor="@android:color/holo_orange_dark" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/linearLayout2"
+        android:layout_centerHorizontal="true"
+        android:background="@color/cardview_shadow_end_color"
+        app:srcCompat="@drawable/a3" />
 
 
 </RelativeLayout>

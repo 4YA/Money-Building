@@ -84,6 +84,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     private ArrayList<String> tallyBookIDArr; //帳本ID
     private ArrayList<String> tallyBookNameArr; //'帳本名稱
     private ArrayList<String> tallyBookMoneyArr; //'帳本金錢
+    private ArrayList<String> tallyBookObjectiveArr; //'帳本目標
+    private ArrayList<String> tallyBookLevelArr; //'帳本等級
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +94,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         tallyBookIDArr = new ArrayList<String>();
         tallyBookNameArr = new ArrayList<String>();
         tallyBookMoneyArr = new ArrayList<String>();
+        tallyBookObjectiveArr= new ArrayList<String>();
+        tallyBookLevelArr = new ArrayList<String>();
         //startActivity(new Intent(HomePage.this,ListViewActivity.class));
         setContentView(R.layout.activity_home_page);
         queue = Volley.newRequestQueue(this);
@@ -136,6 +140,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                     public void onResponse(String response) {
                         try {
                             JSONArray arr = new JSONArray(response);
+
                             for(int s=0;s<arr.length();s++){
                                 addData(1);
                                 JSONObject temp = arr.getJSONObject(s);
@@ -143,6 +148,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 getTallyBookFromServer(temp);
                             }
                         } catch (Throwable t) {
+
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -181,10 +187,14 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     }
 
     public void getTallyBookFromServer(JSONObject temp) throws JSONException {
+
         tallyBookIDArr.add(temp.getString("tallyBookID"));
         tallyBookNameArr.add(temp.getString("tallyBookName"));
         tallyBookMoneyArr.add(temp.getString("tallyBookMoney"));
+        tallyBookObjectiveArr.add(temp.getString("tallyBookObjective"));
+        tallyBookLevelArr.add(temp.getString("tallyBookLevel"));
     }
+
 
     public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -812,6 +822,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             bundle.putString("tallyBookID",tallyBookIDArr.get(index));
                             bundle.putString("tallyBookName", tallyBookNameArr.get(index));
                             bundle.putString("tallyBookMoney", tallyBookMoneyArr.get(index));
+                            bundle.putString("tallyBookObjective", tallyBookObjectiveArr.get(index));
+                            bundle.putString("tallyBookLevel", tallyBookLevelArr.get(index));
                             bundle.putString("back","No");
                             //將Bundle物件assign給intent
                             intent.putExtras(bundle);

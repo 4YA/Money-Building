@@ -43,11 +43,11 @@
                     android:checked="true"
                     android:text="個人記帳" />
 
-                <RadioButton
+               <!--> <RadioButton
                     android:id="@+id/together"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="團體記帳" />
+                    android:text="團體記帳" />-->
             </RadioGroup>
         </LinearLayout>
 

@@ -6,4 +6,6 @@
     <color name="colorAddMoney">#e6e6e6</color>
     <color name="colorGray">#666666</color>
     <color name="colorLogo">#4cd4c2</color>
+    <color name="colorGreen">#1ec105</color>
+    <color name="colorRed">#e12a1c</color>
 </resources>

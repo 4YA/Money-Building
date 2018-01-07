@@ -84,7 +84,9 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private EditBookList recordList;
     private ArrayList<String> memberName;
     private int targetMoney = 0;
-    private int balance = 0;
+    private Integer balance = 0;
+    private Integer objective = 0;
+    private Integer level = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +96,15 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         game = new GameFrgTab();
         recordList = new EditBookList();
         queue = Volley.newRequestQueue(this);
-
         tallyBookID = bundle.getString("tallyBookID");
+        objective = Integer.parseInt(bundle.getString("tallyBookObjective"));
+        level = Integer.parseInt(bundle.getString("tallyBookLevel"));
         balance = Integer.parseInt(bundle.getString("tallyBookMoney"));
         memberName = new ArrayList<String>();
+
+
+        game.writeHint(balance,objective,level);
+
         StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"GetTallyBookServlet",
                 new Response.Listener<String>() {
                     @Override
@@ -140,6 +147,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                                 JSONObject temp = arr.getJSONObject(i);
                                 Log.d("SS",temp.toString());
                                 getRecordFromServer(temp);
+
                             }
                         } catch (Throwable t) {
                         }
@@ -249,6 +257,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onResponse(String response) {
                         initToolbar(nameText);
+                        objective = targetMoney;
                     }
 
                 }, new Response.ErrorListener() {
@@ -505,16 +514,18 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         String month = Integer.toString(c.get(Calendar.MONTH)+1);
         String day = Integer.toString(c.get(Calendar.DATE)+1);
 
-        recordList.loadData(type,year+"/"+month+"/"+day,money,edit);
+        recordList.loadData(type,year+"-"+month+"-"+day,mmoney,edit);
 
         StringRequest request = new StringRequest(Request.Method.POST, "http://140.121.197.130:8901/Money-Building/"+"AddRecordServlet",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
-
-
-
+                            JSONObject j = new JSONObject(response);
+                            recordList.pushRecordID(j.getString("recordID"));
+                            objective =  Integer.parseInt(j.getString("objective"));
+                            balance =  Integer.parseInt(j.getString("balance"));
+                            level =  Integer.parseInt(j.getString("level"));
                         } catch (Throwable t) {
                         }
                     }
@@ -539,7 +550,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         };
 
         queue.add(request);
-
+        game.writeHint(balance,objective,level);
+        game.resetGame();
     }
 
     @Override

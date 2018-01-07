@@ -46,7 +46,8 @@ public class EditBookList extends Fragment {
 
 
     public void loadData(String type,String date,String money,String content){
-            mAppList.add(date+" "+content+" "+money);
+            mAppList.add(type+" "+money+" "+content+" "+date);
+
             mAdapter.notifyDataSetChanged();
     }
 
@@ -109,7 +110,6 @@ public class EditBookList extends Fragment {
                         break;
                     case 1:
                         mAppList.remove(position);
-                        Log.d("WW",((Integer)position).toString());
                         deleteDataFromServer(recordID.get(position));
                         recordID.remove(position);
                         mAdapter.notifyDataSetChanged();
@@ -188,20 +188,55 @@ public class EditBookList extends Fragment {
             }
             ViewHolder holder = (ViewHolder) convertView.getTag();
             String item = getItem(position);
-            holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a1));
-            holder.tv_name.setText(list.get(position));
+            String str[] =  list.get(position).split(" ");
+            switch(str[0]) {
+                case "交通":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a1));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "購物":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a2));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "收入":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a3));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorRed));
+                    break;
+                case "娛樂":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a4));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "飲食":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a5));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "電信":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a6));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "醫療":
+                   holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a7));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
+                case "其他":
+                    holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a8));
+                    holder.tv_name.setTextColor(getResources().getColor(R.color.colorGreen));
+                    break;
 
+            }
+            holder.tv_name.setText(str[1]+ "元");
+            holder.tv_content.setText(str[2]);
             return convertView;
         }
 
         class ViewHolder {
             ImageView iv_icon;
             TextView tv_name;
-
+            TextView tv_content;
             public ViewHolder(View view) {
                 iv_icon = (ImageView) view.findViewById(R.id.iv_icon);
                 tv_name = (TextView) view.findViewById(R.id.tv_name);
-
+                tv_content = (TextView) view.findViewById(R.id.tv_content);
                 view.setTag(this);
             }
         }
@@ -214,15 +249,9 @@ public class EditBookList extends Fragment {
         }
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        if (keyCode == KeyEvent.KEYCODE_BACK) { // 攔截返回鍵
-            Intent intent = new Intent();
-            intent.setClass(getActivity(), HomePage.class);
-            startActivity(intent);
-            getActivity().finish();
-        }
-        return true;
-    }
 
 }
+
+
+
+

@@ -28,11 +28,13 @@ public class GameFrgTab extends Fragment {
     private View rootView;
     private View memberView;
     private List<String> mGameAppList = new ArrayList<String>();
-    private AppAdapter mGameAdapter;
+    private AppAdapter2 mGameAdapter;
     private SwipeMenuListView mGameListView;
     private Button member;
-
-
+    private Integer money;
+    private Integer objective;
+    private Integer level;
+    private TextView hint;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.frg_tab, container, false);
@@ -40,8 +42,8 @@ public class GameFrgTab extends Fragment {
 
         member = (Button) rootView.findViewById(R.id.push_button);
 
-
-
+        hint = (TextView)rootView.findViewById(R.id.hint);
+        resetGame();
         member.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -74,12 +76,33 @@ public class GameFrgTab extends Fragment {
     public void createMember(String name){//String name
 
 
-        mGameAdapter = new AppAdapter(mGameAppList);
+        mGameAdapter = new AppAdapter2(mGameAppList);
 
 
         mGameAppList.add(name);//name
         mGameAdapter.notifyDataSetChanged();
 
+
+    }
+
+    public void resetGame(){
+        hint.setText("目前資金:"+money.toString());
+        hint.append("預期資金:"+objective.toString());
+        hint.append("房子等級:"+level.toString());
+        switch(level){
+            case 0: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level1));break;
+            case 1: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level2));break;
+            case 2: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level3));break;
+            case 3: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level4));break;
+            default: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level5));break;
+        }
+        ((ImageView)rootView.findViewById(R.id.imageView3)).setZ(-1);
+    }
+
+    public void writeHint(Integer money,Integer objective,Integer level){
+        this.money = money;
+        this.objective = objective;
+        this.level = level;
 
     }
 
@@ -97,10 +120,10 @@ public class GameFrgTab extends Fragment {
 
 
 
-    class AppAdapter extends BaseAdapter {
+    class AppAdapter2 extends BaseAdapter {
 
         private List<String> list ;
-        public AppAdapter(List<String> list){
+        public AppAdapter2(List<String> list){
             this.list = list;
         }
 
@@ -123,10 +146,10 @@ public class GameFrgTab extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = View.inflate(getContext(),
-                        R.layout.item_list_app, null);
-                new AppAdapter.ViewHolder(convertView);
+                        R.layout.item_list_member, null);
+                new AppAdapter2.ViewHolder(convertView);
             }
-            AppAdapter.ViewHolder holder = (AppAdapter.ViewHolder) convertView.getTag();
+            AppAdapter2.ViewHolder holder = (AppAdapter2.ViewHolder) convertView.getTag();
             String item = getItem(position);
             holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a1));
             holder.tv_name.setText(list.get(position));
