@@ -3,6 +3,8 @@ package com.example.user.moneybuilding;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,7 +45,7 @@ public class EditBookList extends Fragment {
     private SwipeMenuListView mListView;
     private ArrayList<String> recordID = new ArrayList<String>();
     private RequestQueue queue;
-
+    public String nowRecordID;
 
     public void loadData(String type,String date,String money,String content){
             mAppList.add(type+" "+money+" "+content+" "+date);
@@ -107,6 +109,7 @@ public class EditBookList extends Fragment {
                 switch (index) {
                     case 0:
                         ((MainTallyBook)getActivity()).open();
+                        nowRecordID = recordID.get(position);
                         break;
                     case 1:
                         mAppList.remove(position);
@@ -179,6 +182,7 @@ public class EditBookList extends Fragment {
             return position;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {

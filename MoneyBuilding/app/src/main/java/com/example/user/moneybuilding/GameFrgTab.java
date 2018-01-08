@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class GameFrgTab extends Fragment {
     private Integer objective;
     private Integer level;
     private TextView hint;
+    private ArrayList<String> memberIcon;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.frg_tab, container, false);
@@ -73,22 +76,25 @@ public class GameFrgTab extends Fragment {
 
         return rootView;
     }
-    public void createMember(String name){//String name
+    public void createMember(String name,String icon){//String name
 
 
         mGameAdapter = new AppAdapter2(mGameAppList);
 
-
+        if(memberIcon == null){
+            memberIcon = new ArrayList<String>();
+        }
         mGameAppList.add(name);//name
+        memberIcon.add(icon);
+
         mGameAdapter.notifyDataSetChanged();
 
 
     }
 
     public void resetGame(){
-        hint.setText("目前資金:"+money.toString());
-        hint.append("預期資金:"+objective.toString());
-        hint.append("房子等級:"+level.toString());
+        hint.setText(Html.fromHtml("目前資金:"+money.toString()+"<br>預期資金:"+objective.toString() + "<br>房子等級:"+level.toString()));
+
         switch(level){
             case 0: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level1));break;
             case 1: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level2));break;
@@ -151,7 +157,40 @@ public class GameFrgTab extends Fragment {
             }
             AppAdapter2.ViewHolder holder = (AppAdapter2.ViewHolder) convertView.getTag();
             String item = getItem(position);
-            holder.iv_icon.setImageDrawable(getResources().getDrawable(R.drawable.a1));
+            Log.d("AA",((Integer)position).toString());
+            switch(memberIcon.get(position)){
+                case "1":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=1").transform(new CircleTransform())
+                        .into(holder.iv_icon);break;
+                case "2":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=2").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "3":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=3").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "4":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=4").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "5":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=5").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "6":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=6").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "7":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=7").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+                case "8":
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=8").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+
+                default:
+                    Picasso.with(convertView.getContext()).load(getString(R.string.servletURL) + "CharacterServlet?state=getCharacter&characterID=8").transform(new CircleTransform())
+                            .into(holder.iv_icon);break;
+
+
+            }
+
             holder.tv_name.setText(list.get(position));
 
             return convertView;

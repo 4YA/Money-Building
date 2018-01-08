@@ -83,6 +83,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
     private GameFrgTab game;
     private EditBookList recordList;
     private ArrayList<String> memberName;
+    private ArrayList<String> memberIcon;
     private int targetMoney = 0;
     private Integer balance = 0;
     private Integer objective = 0;
@@ -101,7 +102,7 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
         level = Integer.parseInt(bundle.getString("tallyBookLevel"));
         balance = Integer.parseInt(bundle.getString("tallyBookMoney"));
         memberName = new ArrayList<String>();
-
+        memberIcon = new ArrayList<String>();
 
         game.writeHint(balance,objective,level);
 
@@ -113,9 +114,11 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                             JSONArray arr = new JSONArray(response);
 
                             for(int i=0;i<arr.length();i++){
+                                JSONObject s = arr.getJSONObject(i);
+                                game.createMember(s.getString("name"),s.getString("icon"));
 
-                                game.createMember((String)arr.get(i));
-                                memberName.add((String)arr.get(i));
+                                memberName.add(s.getString("name"));
+                                memberIcon.add(s.getString("icon"));
                             }
                         } catch (Throwable t) {
                         }

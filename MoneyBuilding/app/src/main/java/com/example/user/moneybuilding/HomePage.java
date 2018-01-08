@@ -209,6 +209,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             outRect.left=space;
             outRect.right=space;
             outRect.bottom=space;
+
             if(parent.getLayoutManager() instanceof GridLayoutManager || parent.getLayoutManager() instanceof StaggeredGridLayoutManager){
                 if(parent.getChildAdapterPosition(view) < 2){
                     outRect.top=space;
@@ -404,7 +405,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                         case R.id.delete_tallybook:
                             if(mDatas.size()!=0){
                                 deleteButton=true;
-                                changePicture(R.drawable.plus_del,"gray");
+                                changePicture("gray");
                             }
                             return true;
                     }
@@ -428,7 +429,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                             public void onResponse(String response) {
                                 try{
                                     JSONObject obj = new JSONObject(response);
-                                    Log.d("objTostring",obj.toString());
+
 
 
                                     if(obj.has("isEmpty")){
@@ -495,18 +496,14 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
-    public void changePicture(int url,String backgroundColor){
+    public void changePicture(String backgroundColor){
         int tint = Color.parseColor(backgroundColor);
-        for(int i=0;i<mDatas.size();i++){
-            View imView= mRecyclerView.getLayoutManager().findViewByPosition(i);
-            ImageButton changePic = (ImageButton) imView.findViewById(R.id.adapter_linear_text);
-            changePic.setImageResource(url);
-        }
+
     }
 
     public void changeBack(){
             deleteButton=false;
-            changePicture(R.drawable.plus,"#ffffff");
+            changePicture("#ffffff");
     }
 
     private RadioGroup.OnCheckedChangeListener listenerEndDate = new RadioGroup.OnCheckedChangeListener() {
@@ -583,7 +580,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             mAdapter = new LinearAdapter(mDatas);
             mRecyclerView.setLayoutManager(new GridLayoutManager(this,2));
             mRecyclerView.setAdapter(mAdapter);
-            mRecyclerView.addItemDecoration(new HomePage.SpacesItemDecoration(27));
+            mRecyclerView.addItemDecoration(new HomePage.SpacesItemDecoration(50));
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
@@ -772,8 +769,25 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         @Override
         public void onBindViewHolder(HomePage.LinearAdapter.MyViewHolder holder, int position) {
 
+
+
+            //TextView text = findViewById((int)this.getItemId(0));
+            //text.setText(tallyBookNameArr.get(position));
+            switch(tallyBookLevelArr.get(position)) {
+                case "0":
+                    holder.tv.setImageResource(R.drawable.level1);break;
+                case "1":
+                    holder.tv.setImageResource(R.drawable.level2);break;
+                case "2":
+                    holder.tv.setImageResource(R.drawable.level3);break;
+                case "3":
+                    holder.tv.setImageResource(R.drawable.level4);break;
+                case "4":
+                    holder.tv.setImageResource(R.drawable.level5);break;
+            }
             holder.tv.setContentDescription(list.get(position));
-            holder.tv.setImageResource(R.drawable.plus);
+
+
         }
 
 
