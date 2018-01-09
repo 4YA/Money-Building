@@ -520,7 +520,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                     public void onDateSet(DatePicker view, int year, int month, int day) {
 							mYear = year;
                             mMonth = month+1;
-                            mDay = day;
+                            mDay = day+1;
                             String dateText=mYear+"/"+mMonth+"/"+mDay;
                             showDate.setText(dateText);
                     }
@@ -770,7 +770,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         public void onBindViewHolder(HomePage.LinearAdapter.MyViewHolder holder, int position) {
 
 
-
+            holder.tv_name.setText(tallyBookNameArr.get(position));
             //TextView text = findViewById((int)this.getItemId(0));
             //text.setText(tallyBookNameArr.get(position));
             switch(tallyBookLevelArr.get(position)) {
@@ -799,10 +799,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
             public ImageButton tv;
-
+            public TextView tv_name;
             public MyViewHolder(View itemView) {
                 super(itemView);
                 tv = (ImageButton) itemView.findViewById(R.id.adapter_linear_text);
+                tv_name = (TextView)  itemView.findViewById(R.id.adapter_linear_tallybookname);
                 tv.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

@@ -356,7 +356,8 @@ public class MainTallyBook extends AppCompatActivity implements View.OnClickList
                         mYear = year;
                         month += 1;
                         mMonth = month;
-                        mDay = day;
+                        day+=1;
+                        mDay = day+1;
                         String dateText=mYear+"/"+mMonth+"/"+mDay;
                         showDate.setText(dateText);
                     }

@@ -1,10 +1,14 @@
 package com.example.user.moneybuilding;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
@@ -38,6 +42,7 @@ public class GameFrgTab extends Fragment {
     private Integer level;
     private TextView hint;
     private ArrayList<String> memberIcon;
+    private int msgKey1 = 20;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.frg_tab, container, false);
@@ -92,18 +97,41 @@ public class GameFrgTab extends Fragment {
 
     }
 
-    public void resetGame(){
-        hint.setText(Html.fromHtml("目前資金:"+money.toString()+"<br>預期資金:"+objective.toString() + "<br>房子等級:"+level.toString()));
+    public void resetGame() {
 
-        switch(level){
-            case 0: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level1));break;
-            case 1: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level2));break;
-            case 2: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level3));break;
-            case 3: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level4));break;
-            default: ((ImageView)rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level5));break;
-        }
-        ((ImageView)rootView.findViewById(R.id.imageView3)).setZ(-1);
+
+
+                hint.setText(Html.fromHtml("目前資金:" + money.toString() + "<br>預期資金:" + objective.toString() + "<br>房子等級:" + level.toString()));
+
+                switch (level) {
+                    case 0:
+                        ((ImageView) rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level1));
+                        break;
+                    case 1:
+                        ((ImageView) rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level2));
+                        break;
+                    case 2:
+                        ((ImageView) rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level3));
+                        break;
+                    case 3:
+                        ((ImageView) rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level4));
+                        break;
+                    default:
+                        ((ImageView) rootView.findViewById(R.id.imageView3)).setImageDrawable(getResources().getDrawable(R.drawable.level5));
+                        break;
+                }
+                ((ImageView) rootView.findViewById(R.id.imageView3)).setZ(-1);
+
+
+
+
+
+
+
     }
+
+
+
 
     public void writeHint(Integer money,Integer objective,Integer level){
         this.money = money;
